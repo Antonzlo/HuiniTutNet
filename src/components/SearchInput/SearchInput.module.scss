@@ -1,0 +1,61 @@
+@use 'styles/variables' as *;
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 364px;
+  height: 40px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: $radius-pill;
+  transition: background $transition-fast, box-shadow $transition-fast;
+
+  &:focus-within {
+    background: $text-primary;
+    box-shadow: 0 0 0 2px $accent;
+
+    .input {
+      color: $bg-primary;
+
+      &::placeholder {
+        color: $text-subdued;
+      }
+    }
+  }
+}
+
+.input {
+  flex: 1;
+  font-family: $font-body;
+  font-weight: 400;
+  font-size: 14px;
+  color: $text-primary;
+  background: transparent;
+
+  &::placeholder {
+    color: $text-secondary;
+  }
+
+  &:disabled {
+    opacity: 0.85;
+  }
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: $accent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

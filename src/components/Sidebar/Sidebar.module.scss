@@ -1,0 +1,31 @@
+@use 'styles/variables' as *;
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: $library-expanded-width;
+  min-width: $library-expanded-width;
+  height: 100%;
+  flex-shrink: 0;
+  transition:
+    width 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+    min-width 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+    flex 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.collapsed {
+    width: $library-collapsed-width;
+    min-width: $library-collapsed-width;
+  }
+
+  &.fullscreen {
+    flex: 1;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 8px;
+    width: auto;
+    min-width: 0;
+    max-width: calc(100% - 16px);
+    padding-bottom: calc($player-height + 8px);
+  }
+}

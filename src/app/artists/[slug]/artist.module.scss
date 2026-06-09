@@ -1,0 +1,399 @@
+@use 'styles/variables' as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  min-height: 340px;
+  padding: 24px 24px 28px;
+  overflow: hidden;
+  transition: background 0.4s ease;
+}
+
+.heroBg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center top;
+  filter: blur(24px) brightness(0.45);
+  transform: scale(1.1);
+  pointer-events: none;
+}
+
+.heroInner {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  width: 100%;
+}
+
+.avatar {
+  width: 232px;
+  height: 232px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: $bg-tertiary;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.meta {
+  min-width: 0;
+  padding-bottom: 8px;
+}
+
+.badge {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.name {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin-bottom: 12px;
+}
+
+.stats {
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 24px 12px;
+}
+
+.playBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: $accent;
+  color: $accent-text;
+  box-shadow: 0 4px 24px $accent-glow;
+  transition: transform $transition-fast, background $transition-fast, box-shadow $transition-fast;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.06);
+    background: $accent-hover;
+    box-shadow: 0 6px 32px $accent-glow;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+  }
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: $text-muted;
+}
+
+.followBtn {
+  margin-left: auto;
+  padding: 8px 20px;
+  border-radius: $radius-pill;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 13px;
+  font-weight: 700;
+  color: $text-primary;
+  transition: background $transition-fast, border-color $transition-fast, transform $transition-fast;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.45);
+    transform: scale(1.02);
+  }
+
+  &.followBtnActive {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: transparent;
+    color: $text-secondary;
+  }
+}
+
+.main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 32px;
+  padding: 0 24px 32px;
+}
+
+.popular {
+  min-width: 0;
+}
+
+.sectionTitle {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.moreLink {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-muted;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card {
+  padding: 16px;
+  background: $bg-secondary;
+  border-radius: $radius-md;
+}
+
+.cardTitle {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.cardText {
+  font-size: 14px;
+  line-height: 1.6;
+  color: $text-secondary;
+}
+
+.cardStat {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.cardSub {
+  font-size: 13px;
+  color: $text-muted;
+}
+
+.music {
+  padding: 8px 24px 32px;
+}
+
+.musicHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tab {
+  padding: 6px 14px;
+  border-radius: $radius-pill;
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-primary;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background $transition-fast;
+
+  &.active {
+    background: $text-primary;
+    color: $bg-primary;
+  }
+}
+
+.releaseGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px;
+}
+
+.releaseCard {
+  display: block;
+  cursor: pointer;
+  transition: transform $transition-fast;
+
+  &:hover {
+    transform: translateY(-2px);
+
+    .releaseTitle {
+      text-decoration: underline;
+    }
+  }
+}
+
+.releaseCover {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: $radius-sm;
+  background: $bg-tertiary;
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.releaseImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.releaseTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.releaseMeta {
+  font-size: 13px;
+  color: $text-muted;
+}
+
+.related {
+  padding: 0 24px 40px;
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 20px;
+  margin-top: 16px;
+}
+
+.relatedCard {
+  text-align: center;
+}
+
+.relatedAvatar {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: $bg-tertiary;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: 700;
+  color: $text-muted;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $bg-highlight;
+  }
+}
+
+.relatedImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.relatedName {
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.relatedType {
+  font-size: 12px;
+  color: $text-muted;
+  margin-top: 2px;
+}
+
+.error {
+  margin: 24px;
+  padding: 12px 16px;
+  background: rgba(241, 94, 108, 0.12);
+  border-radius: $radius-md;
+  color: $notification;
+  font-size: 13px;
+}
+
+.loading {
+  padding: 48px 24px;
+  color: $text-secondary;
+}
+
+@media (max-width: 960px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .card {
+    flex: 1;
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    min-height: auto;
+    padding-top: 16px;
+  }
+
+  .heroInner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .avatar {
+    width: 148px;
+    height: 148px;
+    font-size: 48px;
+  }
+}

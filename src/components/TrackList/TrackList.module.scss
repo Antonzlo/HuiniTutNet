@@ -1,0 +1,90 @@
+@use 'styles/variables' as *;
+
+.list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.listPlaylist {
+  padding-bottom: 24px;
+}
+
+.tableHead {
+  display: grid;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 0;
+}
+
+.tableHeadDefault {
+  grid-template-columns: 48px minmax(180px, 3fr) minmax(120px, 2fr) minmax(100px, 1.5fr) 72px 72px 64px;
+  gap: 16px;
+}
+
+.tableHeadPlaylist {
+  grid-template-columns: 40px minmax(200px, 4fr) minmax(120px, 2fr) minmax(100px, 1.2fr) 72px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: $bg-primary;
+}
+
+.tableHeadArtist {
+  grid-template-columns: 40px minmax(200px, 4fr) minmax(80px, 1fr) 72px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: $bg-primary;
+}
+
+.th {
+  font-size: 12px;
+  font-weight: 400;
+  color: $text-muted;
+  letter-spacing: 0.02em;
+}
+
+.thRight {
+  display: flex;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.clockIcon {
+  display: inline-flex;
+  justify-content: flex-end;
+  width: 100%;
+  opacity: 0.7;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 240px;
+  padding: 56px 28px;
+  color: $text-secondary;
+  font-size: 14px;
+  text-align: center;
+
+  svg {
+    opacity: 0.85;
+    filter: drop-shadow(0 6px 20px $accent-glow);
+  }
+}
+
+@media (max-width: 900px) {
+  .tableHeadPlaylist {
+    grid-template-columns: 36px minmax(0, 1fr) 56px;
+
+    .th:nth-child(3),
+    .th:nth-child(4) {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,82 @@
+@use 'styles/variables' as *;
+
+.menu {
+  position: fixed;
+  z-index: 2000;
+  min-width: 248px;
+  max-width: 320px;
+  padding: 4px;
+  background: #282828;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65);
+  animation: menuIn 0.12s ease;
+}
+
+@keyframes menuIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: $text-primary;
+  text-align: left;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.itemIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.itemLabel {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shortcut {
+  font-size: 12px;
+  font-family: inherit;
+  color: $text-muted;
+  letter-spacing: 0.04em;
+}
+
+.sep {
+  height: 1px;
+  margin: 4px 8px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.danger {
+  color: $notification;
+
+  &:hover {
+    background: rgba(241, 94, 108, 0.12);
+  }
+}

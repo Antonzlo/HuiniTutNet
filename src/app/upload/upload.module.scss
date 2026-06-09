@@ -1,0 +1,123 @@
+@use 'styles/variables' as *;
+
+.queue {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  border-radius: $radius-sm;
+  background: $bg-secondary;
+  overflow: hidden;
+}
+
+.head {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.headExpanded {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  background: $bg-tertiary;
+  object-fit: cover;
+}
+
+.meta {
+  min-width: 0;
+}
+
+.title {
+  color: $text-primary;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sub {
+  color: $text-secondary;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.side {
+  text-align: right;
+  white-space: nowrap;
+  color: $text-muted;
+  font-size: 13px;
+}
+
+.lrc {
+  color: $accent;
+}
+
+.status {
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.error {
+  color: $notification;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.body {
+  padding: 0 12px 14px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fieldLabel {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: $text-muted;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  background: $bg-tertiary;
+  border-radius: $radius-pill;
+  font-size: 14px;
+  color: $text-primary;
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: $bg-tertiary;
+  border-radius: $radius-md;
+  font-size: 14px;
+  color: $text-primary;
+  resize: vertical;
+  min-height: 72px;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}

@@ -1,0 +1,358 @@
+@use 'styles/variables' as *;
+
+.tableRow,
+.playlistRow,
+.artistRow {
+  display: grid;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover,
+  &.menuOpen {
+    background: rgba(255, 255, 255, 0.1);
+
+    .indexNum {
+      opacity: 0;
+    }
+
+    .indexPlay {
+      opacity: 1;
+    }
+
+    .actionsCell {
+      opacity: 1;
+    }
+  }
+
+}
+
+.tableRow {
+  grid-template-columns: 48px minmax(180px, 3fr) minmax(120px, 2fr) minmax(100px, 1.5fr) 72px 72px 64px;
+  gap: 16px;
+}
+
+.playlistRow {
+  grid-template-columns: 40px minmax(200px, 4fr) minmax(120px, 2fr) minmax(100px, 1.2fr) 72px;
+  gap: 12px;
+  padding: 6px 16px;
+  border-radius: 0;
+}
+
+.artistRow {
+  grid-template-columns: 40px minmax(200px, 4fr) minmax(80px, 1fr) 72px;
+  gap: 12px;
+  padding: 6px 16px;
+  border-radius: 0;
+}
+
+.indexCell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.indexNum {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: $text-muted;
+  transition: opacity $transition-fast;
+}
+
+.indexPlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity $transition-fast;
+}
+
+.titleCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.artThumb {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-sm;
+  background: $bg-tertiary;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.artImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.titleMeta {
+  min-width: 0;
+}
+
+.titleLink {
+  display: block;
+  font-size: 15px;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  transition: color $transition-fast;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+.playlistRow.active .titleLink,
+.playlistRow.playing .titleLink,
+.artistRow.active .titleLink,
+.artistRow.playing .titleLink,
+.tableRow.active .titleLink,
+.tableRow.playing .titleLink {
+  color: $accent;
+}
+
+.artistSub {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  color: $text-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.albumCol,
+.dateCol,
+.albumCell,
+.artistCell {
+  font-size: 14px;
+  color: $text-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playsCol {
+  font-size: 14px;
+  color: $text-muted;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.formatCell {
+  font-size: 13px;
+  color: $text-muted;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ratingCell {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.endCol {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 72px;
+  min-width: 72px;
+  height: 28px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.endInner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  flex-wrap: nowrap;
+  max-width: 100%;
+  height: 28px;
+}
+
+.duration {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: $text-muted;
+  min-width: 38px;
+  text-align: right;
+  flex-shrink: 0;
+  transition: opacity $transition-fast, max-width $transition-fast, margin $transition-fast;
+}
+
+.rowLike {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 0;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: $radius-sm;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition:
+    opacity $transition-fast,
+    width $transition-fast,
+    transform $transition-fast,
+    background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.06);
+  }
+
+  &.rowLikeActive {
+    width: 28px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.playlistRow:hover .rowLike,
+.artistRow:hover .rowLike,
+.menuOpen .rowLike {
+  width: 28px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.playlistRow:hover .duration,
+.artistRow:hover .duration,
+.menuOpen .duration {
+  opacity: 0;
+  max-width: 0;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.menuAnchor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 0;
+  height: 28px;
+  flex-shrink: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $transition-fast, width $transition-fast;
+}
+
+.playlistRow:hover .menuAnchor,
+.artistRow:hover .menuAnchor,
+.menuOpen .menuAnchor {
+  width: 28px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.moreBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: $radius-sm;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+.actionsCell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity $transition-fast;
+}
+
+.tableRow:hover .actionsCell {
+  opacity: 1;
+}
+
+.editLink,
+.deleteLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  color: $text-muted;
+  border-radius: $radius-sm;
+
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.deleteLink {
+  font-size: 18px;
+  line-height: 1;
+
+  &:hover {
+    color: $notification;
+    background: rgba(241, 94, 108, 0.12);
+  }
+}
+
+.likeCell,
+.moreBtnInline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: $radius-sm;
+  transition: transform $transition-fast, background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.06);
+  }
+}
+
+@media (max-width: 900px) {
+  .playlistRow {
+    grid-template-columns: 36px minmax(0, 1fr) 72px;
+  }
+
+  .albumCol,
+  .dateCol {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .tableRow {
+    grid-template-columns: 40px minmax(0, 1fr) 48px;
+  }
+
+  .artistCell,
+  .formatCell,
+  .ratingCell {
+    display: none;
+  }
+}

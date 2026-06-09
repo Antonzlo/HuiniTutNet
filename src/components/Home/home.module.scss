@@ -1,0 +1,360 @@
+@use 'styles/variables' as *;
+
+.dashboard {
+  padding: 24px 28px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.greeting {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.quickGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (min-width: 900px) {
+  .quickGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.quickCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 12px 8px 8px;
+  border-radius: $radius-sm;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.14);
+  }
+}
+
+.quickThumb {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  background: $bg-tertiary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: $text-muted;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.quickThumbRound {
+  border-radius: 50%;
+}
+
+.quickThumbLiked {
+  background: linear-gradient(135deg, #450af5, #8e4ec6);
+  color: #fff;
+}
+
+.quickTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shelf {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shelfHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.shelfTitle {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.shelfMore {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-muted;
+  white-space: nowrap;
+
+  &:hover {
+    color: $text-primary;
+    text-decoration: underline;
+  }
+}
+
+.shelfTrack {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.card {
+  flex: 0 0 168px;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  border-radius: $radius-md;
+  transition: background $transition-fast;
+  text-align: left;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.cardCircle {
+  flex: 0 0 148px;
+}
+
+.coverWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  background: $bg-tertiary;
+}
+
+.coverWrapCircle {
+  border-radius: 50%;
+}
+
+.coverImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.coverFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: $text-muted;
+  background: $bg-tertiary;
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-primary;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardSub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: $text-muted;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.playOverlay {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: $accent;
+  color: $accent-text;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity $transition-fast, transform $transition-fast;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+
+  .card:hover &,
+  .cardActive & {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cardActive {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.mixCover,
+.radioCover {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.mixBg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.15);
+  filter: blur(2px);
+}
+
+.mixBgFallback {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(145deg, #333, #111);
+}
+
+.mixOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.mixLogo {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 28px;
+  height: auto;
+  z-index: 2;
+}
+
+.mixBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 38%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 10px 12px;
+  gap: 6px;
+  z-index: 2;
+}
+
+.mixBarLogo {
+  width: 22px;
+  height: auto;
+}
+
+.mixBarLabel {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.radioCover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.radioBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.radioLogo {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 24px;
+  height: auto;
+  opacity: 0.92;
+}
+
+.radioAvatars {
+  display: flex;
+  gap: 0;
+  margin-bottom: 12px;
+}
+
+.radioAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid transparent;
+  margin-left: -12px;
+
+  &:first-child {
+    margin-left: 0;
+  }
+}
+
+.radioTitle {
+  font-size: 18px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.empty,
+.error {
+  padding: 48px 16px;
+  text-align: center;
+  color: $text-secondary;
+}
+
+.error {
+  color: $notification;
+}
+
+.searchBlock {
+  padding-top: 8px;
+}
+
+.searchTitle {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}

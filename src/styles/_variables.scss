@@ -1,0 +1,48 @@
+$bg-base: #000000;
+$bg-primary: #0a0a0a;
+$bg-secondary: #141414;
+$bg-tertiary: #1f1f1f;
+$bg-highlight: #282828;
+$bg-elevated: #1a1a1a;
+$bg-glass: rgba(20, 20, 20, 0.72);
+
+$border-subtle: rgba(255, 255, 255, 0.08);
+$border-dark: #282828;
+$border-panel: rgba(255, 255, 255, 0.06);
+
+$text-primary: #ffffff;
+$text-secondary: #b3b3b3;
+$text-muted: #a7a7a7;
+$text-subdued: #6a6a6a;
+
+$accent: #96ff55;
+$accent-hover: #a8ff6e;
+$accent-pressed: #7de03d;
+$accent-green: #96ff55;
+$accent-text: #0a0a0a;
+$accent-muted: rgba(150, 255, 85, 0.12);
+$accent-glow: rgba(150, 255, 85, 0.35);
+$notification: #f15e6c;
+
+$font-display: var(--font-nunito), 'Nunito', system-ui, sans-serif;
+$font-body: var(--font-inter), 'Inter', system-ui, sans-serif;
+$font-nunito: var(--font-nunito), 'Nunito', system-ui, sans-serif;
+$font-inter: var(--font-inter), 'Inter', system-ui, sans-serif;
+
+$header-height: 64px;
+$sidebar-width: 280px;
+$library-collapsed-width: 72px;
+$library-expanded-width: 380px;
+$player-height: 90px;
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 14px;
+$radius-xl: 20px;
+$radius-pill: 500px;
+
+$shadow-sm: 0 4px 24px rgba(0, 0, 0, 0.25);
+$shadow-md: 0 8px 40px rgba(0, 0, 0, 0.45);
+$shadow-glow: 0 0 48px $accent-glow;
+
+$transition-fast: 0.15s ease;
+$transition-base: 0.22s ease;

@@ -1,0 +1,198 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.hero {
+  display: flex;
+  align-items: flex-end;
+  gap: 28px;
+  padding: 28px 28px 32px;
+  @include brand-hero-gradient;
+}
+
+.cover {
+  width: 232px;
+  height: 232px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-md;
+  background: linear-gradient(145deg, rgba(150, 255, 85, 0.15) 0%, $bg-tertiary 100%);
+  border: 1px solid rgba(150, 255, 85, 0.12);
+  box-shadow: $shadow-md, $shadow-glow;
+}
+
+.heroMeta {
+  min-width: 0;
+  padding-bottom: 8px;
+}
+
+.badge {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $accent;
+  background: $accent-muted;
+  border-radius: $radius-pill;
+}
+
+.title {
+  font-family: $font-display;
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin-bottom: 14px;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: $accent-muted;
+  border: 1px solid rgba(150, 255, 85, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: $accent;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 28px 12px;
+}
+
+.playBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: $accent;
+  color: $accent-text;
+  box-shadow: 0 4px 24px $accent-glow;
+  transition: transform $transition-fast, background $transition-fast, box-shadow $transition-fast;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.06);
+    background: $accent-hover;
+    box-shadow: 0 6px 32px $accent-glow;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+    box-shadow: none;
+  }
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: $text-muted;
+  transition: color $transition-fast, transform $transition-fast;
+
+  &:hover:not(:disabled) {
+    color: $text-primary;
+    transform: scale(1.05);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+  }
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 28px 16px;
+}
+
+.chip {
+  padding: 7px 16px;
+  border-radius: $radius-pill;
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-secondary;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid transparent;
+  transition: background $transition-fast, color $transition-fast, border-color $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: $text-primary;
+  }
+
+  &.active {
+    background: $accent-muted;
+    color: $accent;
+    border-color: rgba(150, 255, 85, 0.25);
+    font-weight: 600;
+  }
+}
+
+.ads {
+  margin: 0 28px 16px;
+  padding: 14px 18px;
+  background: $bg-secondary;
+  border: 1px solid $border-panel;
+  border-radius: $radius-md;
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.error {
+  margin: 0 28px 12px;
+  padding: 12px 16px;
+  background: rgba(241, 94, 108, 0.12);
+  border-radius: $radius-md;
+  color: $notification;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px 20px 24px;
+  }
+
+  .cover {
+    width: 148px;
+    height: 148px;
+  }
+
+  .toolbar,
+  .chips {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}

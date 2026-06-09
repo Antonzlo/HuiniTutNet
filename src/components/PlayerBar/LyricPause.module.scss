@@ -1,0 +1,78 @@
+@use 'styles/variables' as *;
+
+.spacer {
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.pause {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.dots {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 14px;
+  height: 22px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  animation: dotPulse 1.4s ease-in-out infinite;
+
+  &:nth-child(1) {
+    transform: translateY(4px);
+    animation-delay: 0s;
+  }
+
+  &:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+
+  &:nth-child(3) {
+    transform: translateY(4px);
+    animation-delay: 0.3s;
+  }
+}
+
+@keyframes dotPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.count {
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1;
+  color: $text-primary;
+  font-variant-numeric: tabular-nums;
+  animation: countIn 0.2s ease;
+}
+
+@keyframes countIn {
+  from {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

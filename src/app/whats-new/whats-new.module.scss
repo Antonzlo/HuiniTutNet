@@ -1,0 +1,162 @@
+@use 'styles/variables' as *;
+
+.page {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 8px 24px 48px;
+}
+
+.hero {
+  margin-bottom: 32px;
+}
+
+.heading {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 12px;
+}
+
+.desc {
+  font-size: 14px;
+  color: $text-secondary;
+  line-height: 1.5;
+  max-width: 560px;
+}
+
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 12px;
+  border-radius: $radius-md;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.rowUnread .title {
+  position: relative;
+
+  &::after {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-left: 6px;
+    border-radius: 50%;
+    background: $accent;
+    vertical-align: middle;
+  }
+}
+
+.coverLink {
+  flex-shrink: 0;
+}
+
+.cover {
+  width: 56px;
+  height: 56px;
+  border-radius: $radius-sm;
+  background: $bg-tertiary;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.artist {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  color: $text-muted;
+
+  &:hover {
+    color: $text-primary;
+    text-decoration: underline;
+  }
+}
+
+.sub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: $text-muted;
+}
+
+.playBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity $transition-fast, transform $transition-fast, background $transition-fast;
+
+  .row:hover & {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: scale(1.06);
+  }
+}
+
+.empty {
+  padding: 48px 16px;
+  text-align: center;
+  color: $text-secondary;
+  font-size: 15px;
+}
+
+.emptyHint {
+  margin-top: 8px;
+  font-size: 13px;
+  color: $text-muted;
+}

@@ -1,0 +1,281 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.view {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.hero {
+  padding: 28px 28px 36px;
+  @include brand-hero-gradient;
+}
+
+.heroTitle {
+  font-family: $font-display;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.heroSub {
+  font-size: 14px;
+  color: $text-secondary;
+  max-width: 480px;
+}
+
+.section {
+  padding: 0 24px 32px;
+}
+
+.sectionTitle {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: $text-primary;
+  margin-bottom: 16px;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  padding: 16px;
+  background: $bg-secondary;
+  border: 1px solid $border-panel;
+  border-radius: $radius-md;
+  transition: background $transition-base, border-color $transition-base;
+
+  &:hover {
+    background: $bg-highlight;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardMeta {
+  font-size: 13px;
+  color: $text-muted;
+  margin-bottom: 12px;
+}
+
+.cardMedia {
+  width: 100%;
+  border-radius: $radius-sm;
+  margin-top: 8px;
+}
+
+.error {
+  margin: 16px 24px 0;
+  padding: 12px 16px;
+  background: rgba(241, 94, 108, 0.12);
+  border-radius: $radius-md;
+  font-size: 13px;
+  color: $notification;
+}
+
+.banner {
+  margin: 0;
+  padding: 20px;
+  background: $bg-secondary;
+  border-radius: $radius-md;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.panel {
+  margin: 0 28px 24px;
+  padding: 24px;
+  background: $bg-secondary;
+  border: 1px solid $border-panel;
+  border-radius: $radius-lg;
+  max-width: 480px;
+}
+
+.panelTitle {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  background: $bg-tertiary;
+  border-radius: $radius-pill;
+  font-size: 14px;
+  color: $text-primary;
+  margin-bottom: 12px;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px $text-primary;
+  }
+}
+
+.label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.btn {
+  padding: 12px 32px;
+  background: $accent;
+  border-radius: $radius-pill;
+  font-weight: 700;
+  font-size: 14px;
+  color: $accent-text;
+  transition: background $transition-fast, transform $transition-fast, box-shadow $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: $accent-hover;
+    transform: scale(1.04);
+    box-shadow: 0 4px 20px $accent-glow;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+}
+
+.btnGhost {
+  padding: 8px 16px;
+  border-radius: $radius-pill;
+  font-weight: 600;
+  font-size: 13px;
+  color: $accent;
+  background: transparent;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.artistHero {
+  padding: 32px 24px 24px;
+  background: linear-gradient(180deg, #3d3d3d 0%, $bg-primary 100%);
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  min-height: 280px;
+}
+
+.artistAvatar {
+  width: 232px;
+  height: 232px;
+  border-radius: 50%;
+  background: $bg-tertiary;
+  box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+}
+
+.artistName {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.artistType {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.artistBio {
+  margin: 16px 24px;
+  padding: 16px 20px;
+  background: $bg-secondary;
+  border-radius: $radius-md;
+  font-size: 14px;
+  line-height: 1.6;
+  color: $text-secondary;
+  max-width: 720px;
+}
+
+.artistList {
+  padding: 0 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.artistRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: $radius-sm;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.artistRowAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: $bg-tertiary;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.artistRowAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.artistRowName {
+  font-size: 16px;
+  font-weight: 500;
+  color: $text-primary;
+}
+
+.artistRowMeta {
+  font-size: 13px;
+  color: $text-muted;
+  margin-top: 2px;
+}
+
+.link {
+  color: $accent;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

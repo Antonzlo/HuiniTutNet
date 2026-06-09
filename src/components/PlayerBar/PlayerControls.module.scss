@@ -1,0 +1,133 @@
+@use 'styles/variables' as *;
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.lg .controls {
+  gap: 24px;
+}
+
+.lg .playBtn {
+  width: 56px;
+  height: 56px;
+  background: $accent;
+  color: $accent-text;
+  box-shadow: 0 4px 24px $accent-glow;
+
+  &:hover:not(:disabled) {
+    background: $accent-hover;
+    box-shadow: 0 6px 32px $accent-glow;
+  }
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-secondary;
+  transition: color $transition-fast, transform $transition-fast;
+
+  &:hover:not(:disabled) {
+    color: $text-primary;
+    transform: scale(1.08);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+  }
+}
+
+.playBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: $text-primary;
+  border-radius: 50%;
+  color: $bg-primary;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.08);
+  }
+
+  &.playing {
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.12);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.timeline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.time {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: $text-muted;
+  min-width: 40px;
+
+  &:last-child {
+    text-align: right;
+  }
+}
+
+.lg .time {
+  font-size: 12px;
+}
+
+.progressWrap {
+  flex: 1;
+  position: relative;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+
+  &:hover .progressFill {
+    background: $accent;
+  }
+}
+
+.lg .progressWrap {
+  height: 6px;
+  border-radius: 3px;
+}
+
+.progressFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  height: 100%;
+  border-radius: inherit;
+  background: $text-primary;
+  pointer-events: none;
+  transition: width 0.1s linear, background $transition-fast;
+}
+
+.progressInput {
+  position: absolute;
+  inset: -8px 0;
+  width: 100%;
+  height: calc(100% + 16px);
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+}

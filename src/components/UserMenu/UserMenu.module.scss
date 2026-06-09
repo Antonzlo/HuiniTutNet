@@ -1,0 +1,161 @@
+@use 'styles/variables' as *;
+
+.wrap {
+  position: relative;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 2px 8px 2px 2px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: $radius-pill;
+  transition: background $transition-fast, transform $transition-fast;
+
+  &:hover,
+  &.open {
+    background: rgba(0, 0, 0, 0.85);
+    transform: scale(1.02);
+  }
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: $bg-tertiary;
+  font-weight: 700;
+  font-size: 12px;
+  color: $text-primary;
+  flex-shrink: 0;
+}
+
+.meta {
+  display: none;
+}
+
+.name {
+  font-weight: 600;
+  font-size: 13px;
+  color: $text-primary;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: $accent;
+  font-weight: 600;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: $accent;
+}
+
+.chevron {
+  display: none;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+  min-width: 260px;
+  padding: 8px;
+  background: $bg-secondary;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-md;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+.menuHeader {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 6px;
+}
+
+.menuEmail {
+  font-size: 12px;
+  color: $text-muted;
+  margin-top: 4px;
+  word-break: break-all;
+}
+
+.badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 3px 10px;
+  border-radius: $radius-pill;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: $accent-muted;
+  color: $accent;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: $radius-sm;
+  font-weight: 500;
+  font-size: 14px;
+  color: $text-primary;
+  text-align: left;
+  text-decoration: none;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.logout {
+  color: $notification;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0 0 $radius-sm $radius-sm;
+  padding-top: 14px;
+
+  &:hover {
+    background: rgba(241, 94, 108, 0.1);
+  }
+}
+
+.guest {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.loginBtn {
+  padding: 8px 24px;
+  background: $text-primary;
+  border-radius: $radius-pill;
+  font-weight: 700;
+  font-size: 14px;
+  color: $bg-primary;
+  transition: transform $transition-fast;
+
+  &:hover {
+    transform: scale(1.04);
+  }
+}
