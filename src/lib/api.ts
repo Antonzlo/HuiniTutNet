@@ -1,4 +1,5 @@
 const DEFAULT_API = "http://localhost:3526";
+const DEFAULT_MEDIA = "https://huini.maks1mio.su";
 
 function isLocalHost(hostname: string) {
   return hostname === "localhost" || hostname === "127.0.0.1";
@@ -34,6 +35,13 @@ export function getApiBase(): string {
 export function getMediaBase(): string {
   const remote = process.env.NEXT_PUBLIC_MEDIA_URL?.replace(/\/$/, "");
   if (remote) return remote;
+  const apiEnv = process.env.NEXT_PUBLIC_API_URL ?? DEFAULT_API;
+  if (apiEnv.includes("localhost") || apiEnv.includes("127.0.0.1")) {
+    return DEFAULT_MEDIA;
+  }
+  if (typeof window !== "undefined" && isLocalHost(window.location.hostname)) {
+    return DEFAULT_MEDIA;
+  }
   return getApiBase();
 }
 
@@ -46,6 +54,27 @@ export function setToken(token: string | null) {
   if (typeof window === "undefined") return;
   if (token) localStorage.setItem("hiunitut_token", token);
   else localStorage.removeItem("hiunitut_token");
+}
+
+export class ApiError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
+export function formatApiError(err: unknown, fallback = "Ошибка запроса"): string {
+  if (err instanceof ApiError) {
+    if (err.status === 404) return "Не найдено";
+    if (err.status >= 500) return "Ошибка сервера — попробуй позже";
+    return err.message || fallback;
+  }
+  if (err instanceof TypeError) return "Сервер недоступен";
+  if (err instanceof Error && err.message) return err.message;
+  return fallback;
 }
 
 export async function api<T>(
@@ -64,7 +93,8 @@ export async function api<T>(
   const res = await fetch(`${getApiBase()}${path}`, { ...opts, headers });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error((data as { error?: string }).error ?? res.statusText);
+    const msg = (data as { error?: string }).error ?? res.statusText;
+    throw new ApiError(typeof msg === "string" ? msg : res.statusText, res.status);
   }
   return data as T;
 }

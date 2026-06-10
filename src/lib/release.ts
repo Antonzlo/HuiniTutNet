@@ -215,14 +215,20 @@ export function findTrackRelease(track: Track, catalog: Track[]): Release | unde
   return releases.find((r) => r.tracks.some((t) => t.id === track.id));
 }
 
-export function trackReleaseUrl(track: Track, catalog?: Track[]): string {
+export function trackReleaseUrl(
+  track: Track,
+  catalog?: Track[],
+  contextReleaseSlug?: string
+): string {
+  if (contextReleaseSlug) return canonicalReleaseUrl(contextReleaseSlug);
   if (track.release?.slug) return canonicalReleaseUrl(track.release.slug);
-  const album = track.album?.trim();
-  if (album) return canonicalReleaseUrl(slugifyRelease(album));
+  if (track.singleRelease?.slug) return canonicalReleaseUrl(track.singleRelease.slug);
   if (catalog?.length) {
     const release = findTrackRelease(track, catalog);
     if (release?.slug) return canonicalReleaseUrl(release.slug);
   }
+  const album = track.album?.trim();
+  if (album) return canonicalReleaseUrl(slugifyRelease(album));
   return canonicalReleaseUrl(`single-${track.id}`);
 }
 

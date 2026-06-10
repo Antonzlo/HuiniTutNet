@@ -43,6 +43,7 @@ export type Track = {
   durationSec?: number | null;
   playCount?: number;
   coverUrl?: string | null;
+  useAlbumCover?: boolean;
   lrcUrl?: string | null;
   published?: boolean;
   uploadedById?: string;

@@ -17,6 +17,7 @@ type Props = {
   catalog?: Track[];
   playContextId?: string;
   showSingleLinks?: boolean;
+  contextReleaseSlug?: string;
   onTrackDeleted?: (id: string) => void;
 };
 
@@ -30,6 +31,7 @@ export function HiuniTrackList({
   catalog,
   playContextId,
   showSingleLinks,
+  contextReleaseSlug,
   onTrackDeleted,
 }: Props) {
   const { playTrack, currentTrack, isPlaying } = usePlayer();
@@ -109,6 +111,7 @@ export function HiuniTrackList({
                 active={active}
                 playing={active && isPlaying}
                 queue={releaseCatalog}
+                contextReleaseSlug={contextReleaseSlug}
                 showSingleLink={showSingleLinks}
                 onPlay={() =>
                   playTrack(track, {

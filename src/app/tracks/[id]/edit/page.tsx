@@ -39,6 +39,7 @@ export default function EditTrackPage() {
   const [status, setStatus] = useState("");
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [useAlbumCover, setUseAlbumCover] = useState(false);
   const [singleReleaseId, setSingleReleaseId] = useState<string | null>(null);
   const [singleQuery, setSingleQuery] = useState("");
   const [singleOptions, setSingleOptions] = useState<Array<{ id: string; title: string; slug: string; year?: number | null }>>([]);
@@ -56,7 +57,8 @@ export default function EditTrackPage() {
         setGenre(t.genre ?? "");
         setTrackNumber(t.trackNumber ? String(t.trackNumber) : "");
         setDescription(t.description ?? "");
-        setCoverPreview(t.coverUrl ? mediaUrl(t.coverUrl) : null);
+        setCoverPreview(t.coverUrl ? mediaUrl(t.coverUrl, { original: true }) : null);
+        setUseAlbumCover(Boolean(t.useAlbumCover));
         setSingleReleaseId(t.singleReleaseId ?? null);
         setSingleQuery(t.singleRelease?.title ?? "");
       })
@@ -99,9 +101,14 @@ export default function EditTrackPage() {
           trackNumber: trackNumber.trim() ? Number(trackNumber) : null,
           description: description.trim() || null,
           singleReleaseId: singleReleaseId || null,
+          ...(track?.releaseId ? { useAlbumCover } : {}),
         }),
       });
       setStatus("Сохранено");
+      const refreshed = await api<TrackDetail>(`/api/tracks/${id}`, { auth: false });
+      setTrack(refreshed);
+      setCoverPreview(refreshed.coverUrl ? mediaUrl(refreshed.coverUrl, { original: true }) : null);
+      setUseAlbumCover(Boolean(refreshed.useAlbumCover));
     } catch (ex) {
       setErr(ex instanceof Error ? ex.message : "Ошибка сохранения");
     } finally {
@@ -141,8 +148,25 @@ export default function EditTrackPage() {
       return;
     }
     if (data.coverUrl) {
-      setCoverPreview(mediaUrl(data.coverUrl));
+      setCoverPreview(mediaUrl(data.coverUrl, { original: true }));
+      setUseAlbumCover(false);
       setStatus("Обложка обновлена");
+    }
+  }
+
+  async function onUseAlbumCoverChange(checked: boolean) {
+    setUseAlbumCover(checked);
+    if (!checked || !track?.release?.slug) return;
+    try {
+      const release = await api<{ coverUrl?: string | null }>(
+        `/api/releases/${encodeURIComponent(track.release.slug)}`,
+        { auth: false }
+      );
+      if (release.coverUrl) {
+        setCoverPreview(mediaUrl(release.coverUrl, { original: true }));
+      }
+    } catch {
+      /* keep current preview */
     }
   }
 
@@ -169,6 +193,26 @@ export default function EditTrackPage() {
               Сменить обложку
               <input type="file" accept="image/*" hidden onChange={(e) => void onCoverChange(e.target.files?.[0] ?? null)} />
             </label>
+            {track.releaseId && (
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginTop: 12,
+                  fontSize: 13,
+                  color: "#b3b3b3",
+                  cursor: "pointer",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={useAlbumCover}
+                  onChange={(e) => void onUseAlbumCoverChange(e.target.checked)}
+                />
+                Обложка как у альбома
+              </label>
+            )}
           </div>
         </div>
 

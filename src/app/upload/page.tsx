@@ -8,6 +8,7 @@ import type { DbRelease } from "@/lib/release";
 import { canonicalReleaseUrl, releaseTypeLabel } from "@/lib/release";
 import { ArtistNameInput } from "@/components/ArtistNameInput/ArtistNameInput";
 import type { InspectedAudio, ReleaseType } from "@/lib/types";
+import { runPool } from "@/lib/async-pool";
 import { pairLrcWithAudio, splitUploadFiles } from "@/lib/upload-files";
 import page from "@/styles/page.module.scss";
 import auth from "@/components/LoginScreen/LoginScreen.module.scss";
@@ -252,9 +253,9 @@ export default function UploadPage() {
 
     setQueue((prev) => [...prev.filter((q) => q.status !== "done"), ...items]);
     setBusy(true);
-    for (const item of items) {
+    await runPool(items, 4, async (item) => {
       await inspectOne(item);
-    }
+    });
     setBusy(false);
   }
 

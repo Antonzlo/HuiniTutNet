@@ -26,6 +26,7 @@ type Props = {
   variant?: "default" | "playlist" | "artist";
   hideArtist?: boolean;
   showSingleLink?: boolean;
+  contextReleaseSlug?: string;
   onPlay: () => void;
   onDeleted?: (id: string) => void;
 };
@@ -39,6 +40,7 @@ export function HiuniTrackRow({
   variant = "default",
   hideArtist = false,
   showSingleLink = false,
+  contextReleaseSlug,
   onPlay,
   onDeleted,
 }: Props) {
@@ -183,7 +185,12 @@ export function HiuniTrackRow({
             )}
           </div>
           <div className={styles.titleMeta}>
-            <TrackTitleLink track={track} catalog={queue} className={styles.titleLink} />
+            <TrackTitleLink
+              track={track}
+              catalog={queue}
+              contextReleaseSlug={contextReleaseSlug}
+              className={styles.titleLink}
+            />
             {showSingleLink && single && (
               <Link
                 href={canonicalReleaseUrl(single.slug)}

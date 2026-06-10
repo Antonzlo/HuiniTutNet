@@ -3,11 +3,11 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { api, mediaUrl } from "@/lib/api";
+import { api, formatApiError, mediaUrl } from "@/lib/api";
 import { fetchCached, getCached } from "@/lib/queryCache";
 import type { DbRelease } from "@/lib/release";
 import { fmtTotalDurationDetailed, totalDurationSec } from "@/lib/track";
-import { decodeSlugParam, formatQuality, releaseApiPath } from "@/lib/release";
+import { decodeSlugParam, formatQuality, releaseApiPath, releaseShelfCover } from "@/lib/release";
 import { useCoverGradient } from "@/hooks/useCoverGradient";
 import { HiuniTrackList } from "@/components/TrackList/HiuniTrackList";
 import { ReleaseArtistList } from "@/components/ReleaseArtistList/ReleaseArtistList";
@@ -54,12 +54,26 @@ export default function CanonicalReleasePage() {
     )
       .then(setRelease)
       .catch((e) => {
-        if (!getCached(`release:${slugKey}`, 30 * 60_000)) setErr(e.message);
+        if (!getCached(`release:${slugKey}`, 30 * 60_000)) {
+          setErr(formatApiError(e, "Не удалось загрузить релиз"));
+        }
       });
   }, [slugKey]);
 
   const tracks = useMemo(() => release?.tracks ?? [], [release]);
-  const coverSrc = release?.coverUrl ? mediaUrl(release.coverUrl, { w: 512 }) : null;
+  const coverPath = useMemo(() => {
+    if (!release) return null;
+    if (release.coverUrl) return release.coverUrl;
+    return releaseShelfCover({
+      key: release.slug,
+      title: release.title,
+      year: release.year,
+      tracks,
+      isSingle: release.type === "SINGLE",
+      type: release.type,
+    });
+  }, [release, tracks]);
+  const coverSrc = coverPath ? mediaUrl(coverPath, { w: 512 }) : null;
   const { heroStyle } = useCoverGradient(coverSrc);
   const totalSec = totalDurationSec(tracks);
   const saved = slug ? isSavedBySlug(slug) : false;
@@ -148,6 +162,7 @@ export default function CanonicalReleasePage() {
           variant="artist"
           hideArtist={release.type !== "COMPILATION"}
           playContextId={playContextId ?? undefined}
+          contextReleaseSlug={release.slug}
           showSingleLinks
           emptyMessage="Нет треков"
         />
