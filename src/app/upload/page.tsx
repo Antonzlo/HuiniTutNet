@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { api, getApiBase, getToken } from "@/lib/api";
+import { inspectAudio } from "@/lib/inspect-audio";
 import type { DbRelease } from "@/lib/release";
 import { canonicalReleaseUrl, releaseTypeLabel } from "@/lib/release";
 import { ArtistNameInput } from "@/components/ArtistNameInput/ArtistNameInput";
@@ -60,6 +61,29 @@ function fmtDuration(sec?: number) {
   const m = Math.floor(sec / 60);
   const ss = Math.floor(sec % 60);
   return `${m}:${ss.toString().padStart(2, "0")}`;
+}
+
+function fmtBitrate(bps?: number) {
+  if (!bps) return undefined;
+  return `${Math.round(bps / 1000)} kbps`;
+}
+
+function fmtFileSize(bytes: number) {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`;
+}
+
+function fmtAudioInfo(item: QueueItem) {
+  if (!item.inspect) return "";
+  const parts = [];
+  if (item.inspect.bitrate) parts.push(fmtBitrate(item.inspect.bitrate));
+  if (item.inspect.bitsPerSample) parts.push(`${item.inspect.bitsPerSample}bit`);
+  if (item.inspect.sampleRate) parts.push(`${item.inspect.sampleRate / 1000}kHz`);
+  parts.push(fmtFileSize(item.inspect.fileSize));
+  return parts.join(" · ");
 }
 
 function buildEdit(inspect: InspectedAudio, audio: File): QueueEdit {
@@ -190,37 +214,16 @@ export default function UploadPage() {
   }
 
   async function inspectOne(item: QueueItem): Promise<InspectedAudio | null> {
-    const token = getToken();
-    if (!token) return null;
-
     patchItem(item.id, { status: "inspecting" });
-    const fd = new FormData();
-    fd.append("file", item.audio);
-
     try {
-      const res = await fetch(`${getApiBase()}/api/tracks/inspect`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        patchItem(item.id, { status: "error", error: formatApiError(data) });
-        return null;
-      }
-      const inspect = data as InspectedAudio;
+      const inspect = await inspectAudio(item.audio);
       const edit = buildEdit(inspect, item.audio);
       if (targetRelease) {
         edit.album = targetRelease.title;
         edit.albumArtist = targetRelease.albumArtist ?? edit.albumArtist;
         if (targetRelease.year) edit.year = String(targetRelease.year);
       }
-      patchItem(item.id, {
-        status: "ready",
-        inspect,
-        edit,
-        error: undefined,
-      });
+      patchItem(item.id, { status: "ready", inspect, edit, error: undefined });
       return inspect;
     } catch {
       patchItem(item.id, { status: "error", error: "Не удалось прочитать метаданные" });
@@ -595,6 +598,11 @@ export default function UploadPage() {
                           {item.edit.artistName || "—"} · {item.audio.name}
                           {item.inspect && ` · ${fmtDuration(item.inspect.durationSec)}`}
                         </div>
+                        {item.inspect && (
+                          <div className={s.sub}>
+                            {fmtAudioInfo(item)}
+                          </div>
+                        )}
                         {item.error && <div className={s.error}>{item.error}</div>}
                       </div>
                       <div className={s.side}>
