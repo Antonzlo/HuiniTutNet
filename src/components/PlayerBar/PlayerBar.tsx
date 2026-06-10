@@ -57,6 +57,13 @@ export function PlayerBar() {
     openImmersive("lyrics");
   }
 
+  function handleVolumeWheel(e: React.WheelEvent<HTMLInputElement>) {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -5 : 5;
+    const newVolume = Math.max(0, Math.min(100, volPct + delta));
+    setVolume(newVolume / 100);
+  }
+
   return (
     <section
       className={`${styles.root} ${panelFullscreen ? styles.rootFullscreen : ""}`}
@@ -168,6 +175,7 @@ export function PlayerBar() {
           max={100}
           value={volPct}
           onChange={(e) => setVolume(Number(e.target.value) / 100)}
+          onWheel={handleVolumeWheel}
           className={styles.volumeSlider}
           style={{ "--vol": `${volPct}%` } as React.CSSProperties}
           aria-label="Громкость"
