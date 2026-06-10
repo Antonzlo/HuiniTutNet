@@ -5,6 +5,7 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import type { Artist } from "@/lib/types";
 import { ArtistAvatar } from "@/components/ArtistAvatar/ArtistAvatar";
+import { ListPageSkeleton } from "@/components/Skeleton";
 import page from "@/styles/page.module.scss";
 
 export default function ArtistsPage() {
@@ -12,9 +13,14 @@ export default function ArtistsPage() {
   const [name, setName] = useState("");
   const [isExternal, setIsExternal] = useState(false);
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(true);
 
   function load() {
-    api<Artist[]>("/api/artists", { auth: false }).then(setArtists).catch((e) => setErr(e.message));
+    setLoading(true);
+    api<Artist[]>("/api/artists", { auth: false })
+      .then(setArtists)
+      .catch((e) => setErr(e.message))
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -32,6 +38,8 @@ export default function ArtistsPage() {
       setErr(ex instanceof Error ? ex.message : "Ошибка");
     }
   }
+
+  if (loading && artists.length === 0) return <ListPageSkeleton rows={8} />;
 
   return (
     <div className={page.view}>

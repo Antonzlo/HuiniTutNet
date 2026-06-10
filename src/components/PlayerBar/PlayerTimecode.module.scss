@@ -1,0 +1,108 @@
+@use 'styles/variables' as *;
+
+.wrap {
+  --size-thumb: 14px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 5;
+  pointer-events: none;
+  transition: height 0.18s ease;
+}
+
+.wrap.hasTrack {
+  pointer-events: auto;
+}
+
+.wrap.isPlaying,
+.wrap.hasTrack {
+  height: 2px;
+}
+
+.wrap:hover,
+.wrap:focus-within {
+  height: 6px;
+}
+
+.progressBg {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.progressFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: $accent;
+  pointer-events: none;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 12px rgba($accent, 0.45);
+}
+
+.thumb {
+  position: absolute;
+  top: 50%;
+  width: var(--size-thumb);
+  height: var(--size-thumb);
+  margin-top: calc(var(--size-thumb) / -2);
+  margin-left: calc(var(--size-thumb) / -2);
+  border-radius: 50%;
+  background: $accent;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.45);
+}
+
+.wrap:hover .thumb,
+.wrap:focus-within .thumb {
+  opacity: 1;
+}
+
+.time {
+  position: absolute;
+  top: -26px;
+  padding: 3px 8px;
+  border-radius: $radius-sm;
+  background: rgba(0, 0, 0, 0.78);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: $text-primary;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+.timeStart {
+  transform: translateX(-50%);
+}
+
+.timeEnd {
+  right: 12px;
+}
+
+.wrap:hover .time,
+.wrap:focus-within .time {
+  opacity: 1;
+}
+
+.slider {
+  position: absolute;
+  inset: -12px 0;
+  width: 100%;
+  height: calc(100% + 24px);
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}

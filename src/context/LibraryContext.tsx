@@ -71,7 +71,6 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
 
   const openFullscreen = useCallback(() => {
     setMode("fullscreen");
-    setView("grid-lg");
     setCreateOpen(false);
     setSortOpen(false);
   }, []);

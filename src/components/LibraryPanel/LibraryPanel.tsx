@@ -10,9 +10,11 @@ import {
   sortLibraryItems,
 } from "@/lib/library";
 import { LibraryIcon } from "@/components/icons";
-import { LibraryCover } from "./LibraryCover";
+import overlay from "@/components/ShelfPlayOverlay/ShelfPlayOverlay.module.scss";
+import { LibraryPlayableCover } from "./LibraryPlayableCover";
 import { LibraryHeader } from "./LibraryHeader";
 import { LibraryContent } from "./LibraryContent";
+import { Skeleton } from "@/components/Skeleton";
 import s from "./LibraryPanel.module.scss";
 
 export function LibraryPanel() {
@@ -42,10 +44,22 @@ export function LibraryPanel() {
           </svg>
         </Link>
         <div className={s.stripList}>
-          {!loading &&
-            visible.slice(0, 32).map((item) => (
-              <Link key={item.id} href={item.href} className={s.stripItem} title={item.title}>
-                <LibraryCover item={item} size={48} />
+          {loading
+            ? Array.from({ length: 6 }, (_, i) => (
+                <Skeleton
+                  key={i}
+                  round
+                  style={{ width: 48, height: 48, marginBottom: 4, animationDelay: `${i * 0.06}s` }}
+                />
+              ))
+            : visible.slice(0, 32).map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                className={`${s.stripItem} ${overlay.shelfCard}`}
+                title={item.title}
+              >
+                <LibraryPlayableCover item={item} size={48} />
               </Link>
             ))}
         </div>

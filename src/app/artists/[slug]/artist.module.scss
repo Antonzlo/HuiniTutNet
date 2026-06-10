@@ -243,6 +243,41 @@
   }
 }
 
+.showAllBtn {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-muted;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $text-primary;
+    text-decoration: underline;
+  }
+}
+
+.releaseRow {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+
+  .releaseCard {
+    flex: 0 0 160px;
+    width: 160px;
+  }
+}
+
 .releaseGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -271,6 +306,7 @@
   margin-bottom: 12px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  position: relative;
 }
 
 .releaseImg {
@@ -292,6 +328,11 @@
 .releaseMeta {
   font-size: 13px;
   color: $text-muted;
+}
+
+.releaseMetaSub {
+  font-size: 13px;
+  color: $text-subdued;
 }
 
 .related {

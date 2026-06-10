@@ -1,5 +1,3 @@
-import type { Track } from "./types";
-
 export type LibraryItemType = "playlist" | "album" | "artist";
 export type LibraryFilter = "all" | "playlist" | "album" | "artist";
 export type LibrarySort = "recent" | "added" | "name" | "creator";
@@ -81,21 +79,12 @@ export function fmtAddedAt(iso: string): string {
   return new Date(iso).toLocaleDateString("ru-RU", { day: "numeric", month: "short", year: "numeric" });
 }
 
-export function isLibraryItemActive(
-  item: LibraryItem,
-  pathname: string,
-  currentTrack: Track | null
-): boolean {
-  if (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))) return true;
-  if (!currentTrack) return false;
-  if (item.type === "artist") {
-    const slug = item.href.replace("/artists/", "").split("/")[0];
-    return (
-      currentTrack.artist?.slug === slug ||
-      currentTrack.artists?.some((a) => a.artist.slug === slug) === true
-    );
-  }
-  return false;
+export function isLibraryItemActive(item: LibraryItem, pathname: string): boolean {
+  return pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+}
+
+export function isLibraryItemPlaying(item: LibraryItem, queueContextId: string | null): boolean {
+  return queueContextId === `library:${item.id}`;
 }
 
 export const SORT_LABELS: Record<LibrarySort, string> = {

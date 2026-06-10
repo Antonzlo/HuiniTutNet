@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { PlayerProvider } from "@/context/PlayerContext";
+import { PlayerPanelProvider } from "@/context/PlayerPanelContext";
 import { LibraryProvider } from "@/context/LibraryContext";
 import { LibraryItemsProvider } from "@/context/LibraryItemsContext";
 import { FavoritesProvider } from "@/context/FavoritesContext";
@@ -12,10 +13,10 @@ import { SavedReleasesProvider } from "@/context/SavedReleasesContext";
 import { SavedPlaylistsProvider } from "@/context/SavedPlaylistsContext";
 import { WhatsNewProvider } from "@/context/WhatsNewContext";
 import { SearchProvider, useSearch } from "@/context/SearchContext";
+import { HomeFeedProvider } from "@/context/HomeFeedContext";
 import { AppLayout } from "@/components/Layout/AppLayout";
 import { useBlockContextMenu } from "@/hooks/useBlockContextMenu";
-import { HiuniMascot } from "@/components/Brand/HiuniMascot";
-import styles from "@/components/LoginScreen/LoginScreen.module.scss";
+import { AuthGateSkeleton } from "@/components/Skeleton";
 
 const AUTH_ROUTES = ["/login", "/register"];
 
@@ -36,16 +37,7 @@ function AuthGate({ children }: { children: ReactNode }) {
     if (isAuthenticated && isAuthPage) router.replace("/");
   }, [loading, isAuthenticated, isAuthPage, router]);
 
-  if (loading) {
-    return (
-      <div className={styles.screen}>
-        <div className={styles.progressText}>
-          <HiuniMascot size={64} />
-          <span>Загрузка…</span>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <AuthGateSkeleton />;
 
   if (!isAuthenticated && !isAuthPage) return null;
   if (isAuthenticated && isAuthPage) return null;
@@ -54,10 +46,12 @@ function AuthGate({ children }: { children: ReactNode }) {
 
   return (
     <PlayerProvider>
+      <PlayerPanelProvider>
       <FavoritesProvider>
         <SavedReleasesProvider>
         <SavedPlaylistsProvider>
         <WhatsNewProvider>
+        <HomeFeedProvider>
         <LibraryProvider>
           <LibraryItemsProvider>
             <SearchProvider>
@@ -65,10 +59,12 @@ function AuthGate({ children }: { children: ReactNode }) {
             </SearchProvider>
           </LibraryItemsProvider>
         </LibraryProvider>
+        </HomeFeedProvider>
         </WhatsNewProvider>
         </SavedPlaylistsProvider>
         </SavedReleasesProvider>
       </FavoritesProvider>
+      </PlayerPanelProvider>
     </PlayerProvider>
   );
 }

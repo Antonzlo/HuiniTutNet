@@ -1,0 +1,70 @@
+@use 'styles/variables' as *;
+@use 'styles/scroll' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.tabsHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 12px 0;
+  flex-shrink: 0;
+}
+
+.tabs {
+  display: flex;
+  gap: 20px;
+  padding: 0 4px;
+}
+
+.tab {
+  position: relative;
+  padding: 10px 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: $text-muted;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.tabActive {
+  color: $text-primary;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: $accent;
+    border-radius: 2px;
+  }
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  @include overlay-scroll;
+}
+
+.emptyRecent {
+  padding: 24px 20px;
+  font-size: 14px;
+  color: $text-muted;
+}
+
+.closeX {
+  font-size: 22px;
+  line-height: 1;
+  color: $text-secondary;
+}

@@ -10,6 +10,20 @@
   padding-bottom: 24px;
 }
 
+.listScroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.listGrid {
+  min-width: 100%;
+}
+
+.listGridCompact {
+  min-width: 720px;
+}
+
 .tableHead {
   display: grid;
   gap: 12px;
@@ -22,22 +36,43 @@
 .tableHeadDefault {
   grid-template-columns: 48px minmax(180px, 3fr) minmax(120px, 2fr) minmax(100px, 1.5fr) 72px 72px 64px;
   gap: 16px;
+
+  .thIndex { grid-column: 1; }
+  .thTitle { grid-column: 2; }
+  .thArtist { grid-column: 3; }
+  .thAlbum { grid-column: 4; }
+  .thFormat { grid-column: 5; }
+  .thRating { grid-column: 6; }
+  .thActions { grid-column: 7; }
 }
 
 .tableHeadPlaylist {
-  grid-template-columns: 40px minmax(200px, 4fr) minmax(120px, 2fr) minmax(100px, 1.2fr) 72px;
+  grid-template-columns: 40px minmax(200px, 4fr) minmax(90px, 1fr) minmax(120px, 2fr) minmax(100px, 1.2fr) 72px;
   position: sticky;
   top: 0;
   z-index: 2;
   background: $bg-primary;
+
+  .thIndex { grid-column: 1; }
+  .thTitle { grid-column: 2; }
+  .thFormat { grid-column: 3; }
+  .thAlbum { grid-column: 4; }
+  .thDate { grid-column: 5; }
+  .thDuration { grid-column: 6; }
 }
 
 .tableHeadArtist {
-  grid-template-columns: 40px minmax(200px, 4fr) minmax(80px, 1fr) 72px;
+  grid-template-columns: 40px minmax(200px, 4fr) minmax(90px, 1fr) minmax(80px, 1fr) 72px;
   position: sticky;
   top: 0;
   z-index: 2;
   background: $bg-primary;
+
+  .thIndex { grid-column: 1; }
+  .thTitle { grid-column: 2; }
+  .thFormat { grid-column: 3; }
+  .thPlays { grid-column: 4; }
+  .thDuration { grid-column: 5; }
 }
 
 .th {
@@ -79,12 +114,34 @@
 }
 
 @media (max-width: 900px) {
-  .tableHeadPlaylist {
-    grid-template-columns: 36px minmax(0, 1fr) 56px;
+  .listGridCompact {
+    min-width: 0;
+  }
 
-    .th:nth-child(3),
-    .th:nth-child(4) {
+  .tableHeadPlaylist {
+    grid-template-columns: 36px minmax(0, 1fr) 72px;
+
+    .thFormat,
+    .thAlbum,
+    .thDate {
       display: none;
+    }
+
+    .thDuration {
+      grid-column: 3;
+    }
+  }
+
+  .tableHeadArtist {
+    grid-template-columns: 36px minmax(0, 1fr) 72px;
+
+    .thFormat,
+    .thPlays {
+      display: none;
+    }
+
+    .thDuration {
+      grid-column: 3;
     }
   }
 }

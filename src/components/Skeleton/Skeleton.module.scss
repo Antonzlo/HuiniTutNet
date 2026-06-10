@@ -1,0 +1,42 @@
+@use 'styles/variables' as *;
+
+.bone {
+  display: block;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+.round {
+  border-radius: 50%;
+}
+
+.pill {
+  border-radius: $radius-pill;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    animation: none;
+  }
+}

@@ -1,0 +1,256 @@
+@use "styles/variables" as *;
+
+.layout {
+  width: 100%;
+  padding: 0 24px 32px;
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.heroSub {
+  max-width: none;
+}
+
+.card {
+  background: $bg-secondary;
+  border-radius: 12px;
+  padding: 20px;
+  width: 100%;
+}
+
+.footer {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: $text-muted;
+  margin: 0 0 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.coverRow {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.coverImg {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: $bg-tertiary;
+}
+
+.coverPlaceholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  background: $bg-tertiary;
+}
+
+.coverBtn {
+  font-size: 13px;
+  color: $accent;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.field {
+  margin-bottom: 12px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: $text-muted;
+  font-weight: 700;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 12px 14px;
+  background: $bg-tertiary;
+  border-radius: 12px;
+  color: $text-primary;
+  border: none;
+}
+
+.select {
+  border-radius: 12px;
+}
+
+.trackList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.trackRow {
+  display: grid;
+  grid-template-columns: 28px 40px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  background: $bg-tertiary;
+  border-radius: 10px;
+}
+
+.trackNum {
+  font-size: 13px;
+  color: $text-muted;
+  text-align: center;
+}
+
+.trackThumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  object-fit: cover;
+  background: $bg-highlight;
+}
+
+.trackMeta {
+  min-width: 0;
+}
+
+.trackTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackSub {
+  font-size: 12px;
+  color: $text-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackActions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.iconBtn {
+  background: transparent;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 12px;
+  border-radius: 6px;
+
+  &:hover {
+    color: $text-primary;
+    background: $bg-highlight;
+  }
+}
+
+.linkBtn {
+  color: $accent;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.searchBox {
+  margin-top: 12px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 14px;
+  background: $bg-tertiary;
+  border-radius: 500px;
+  color: $text-primary;
+  border: none;
+  margin-bottom: 8px;
+}
+
+.searchResults {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.searchItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  background: $bg-tertiary;
+  border-radius: 8px;
+}
+
+.searchItemMeta {
+  min-width: 0;
+  flex: 1;
+}
+
+.addBtn {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 500px;
+  background: $accent;
+  color: #000;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.empty {
+  font-size: 13px;
+  color: $text-muted;
+  padding: 12px 0;
+}
+
+.statusOk {
+  color: $accent;
+  font-size: 13px;
+}
+
+.statusErr {
+  color: #f87171;
+  font-size: 13px;
+}

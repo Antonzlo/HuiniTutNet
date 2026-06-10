@@ -36,6 +36,8 @@ export type HomeSection = {
 export type HomeFeed = {
   greeting: string;
   sections: HomeSection[];
+  fingerprint?: string;
+  cached?: boolean;
 };
 
 export type MixPageData = {

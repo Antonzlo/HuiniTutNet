@@ -7,9 +7,11 @@ import { StarRating } from "@/components/StarRating";
 import { api, mediaUrl } from "@/lib/api";
 import type { Track } from "@/lib/types";
 import { fmtCount, fmtDuration, fmtRelativeDate } from "@/lib/track";
+import { canonicalReleaseUrl, formatQuality } from "@/lib/release";
 import { TrackArtistLinks } from "@/components/TrackArtistLinks";
 import { TrackTitleLink } from "@/components/TrackTitleLink";
 import { usePlayer } from "@/context/PlayerContext";
+import { usePlayerPanel } from "@/context/PlayerPanelContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useTrackPlayCount } from "@/hooks/useTrackPlayCount";
 import { TrackContextMenu } from "./TrackContextMenu";
@@ -23,6 +25,7 @@ type Props = {
   queue?: Track[];
   variant?: "default" | "playlist" | "artist";
   hideArtist?: boolean;
+  showSingleLink?: boolean;
   onPlay: () => void;
   onDeleted?: (id: string) => void;
 };
@@ -35,10 +38,12 @@ export function HiuniTrackRow({
   queue,
   variant = "default",
   hideArtist = false,
+  showSingleLink = false,
   onPlay,
   onDeleted,
 }: Props) {
   const { togglePlay, addToQueue } = usePlayer();
+  const { openSidePanel } = usePlayerPanel();
   const { isFavorite, toggle } = useFavorites();
   const [stars, setStars] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -47,6 +52,8 @@ export function HiuniTrackRow({
   const isArtist = variant === "artist";
   const fav = isFavorite(track.id);
   const plays = useTrackPlayCount(track);
+  const quality = formatQuality(track);
+  const single = track.singleRelease;
 
   const openMenu = useCallback((x: number, y: number) => {
     setMenuPos({ x, y });
@@ -92,6 +99,10 @@ export function HiuniTrackRow({
     e.stopPropagation();
     if (active) void togglePlay();
     else onPlay();
+  }
+
+  function handleRowActivate() {
+    if (active) openSidePanel("now-playing");
   }
 
   const rowClass = [
@@ -141,14 +152,14 @@ export function HiuniTrackRow({
       <div
         className={rowClass}
         data-track-row
-        onClick={onPlay}
+        onClick={handleRowActivate}
         onContextMenu={handleContextMenu}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            onPlay();
+            handleRowActivate();
           }
         }}
       >
@@ -173,6 +184,15 @@ export function HiuniTrackRow({
           </div>
           <div className={styles.titleMeta}>
             <TrackTitleLink track={track} catalog={queue} className={styles.titleLink} />
+            {showSingleLink && single && (
+              <Link
+                href={canonicalReleaseUrl(single.slug)}
+                className={styles.singleLink}
+                onClick={(e) => e.stopPropagation()}
+              >
+                Сингл{single.year ? ` · ${single.year}` : ""}
+              </Link>
+            )}
             {!hideArtist && (
               <TrackArtistLinks track={track} className={styles.artistSub} />
             )}
@@ -181,11 +201,13 @@ export function HiuniTrackRow({
 
         {isArtist ? (
           <>
+            <span className={styles.formatCell}>{quality}</span>
             <span className={styles.playsCol}>{fmtCount(plays)}</span>
             {endActions}
           </>
         ) : isPlaylist ? (
           <>
+            <span className={styles.formatCell}>{quality}</span>
             <span className={styles.albumCol}>{track.album ?? "—"}</span>
             <span className={styles.dateCol}>{fmtRelativeDate(createdAt)}</span>
             {endActions}
@@ -196,7 +218,7 @@ export function HiuniTrackRow({
               <TrackArtistLinks track={track} />
             </span>
             <span className={styles.albumCell}>{track.album ?? "—"}</span>
-            <span className={styles.formatCell}>{track.format.toUpperCase()}</span>
+            <span className={styles.formatCell}>{quality}</span>
             <div className={styles.ratingCell} onClick={(e) => e.stopPropagation()}>
               <StarRating value={stars} onChange={rate} size={14} />
             </div>

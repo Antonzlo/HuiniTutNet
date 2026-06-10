@@ -9,6 +9,7 @@ import { HiuniTrackList } from "@/components/TrackList/HiuniTrackList";
 import { RadioCover } from "@/components/Home/RadioCover";
 import { PlaylistSaveButton } from "@/components/Home/PlaylistSaveButton";
 import { PlayCollectionButton } from "@/components/PlayCollectionButton";
+import { CollectionPageSkeleton } from "@/components/Skeleton";
 import s from "../../mix/[id]/mix.module.scss";
 
 export default function RadioPage() {
@@ -24,7 +25,7 @@ export default function RadioPage() {
       .finally(() => setLoading(false));
   }, [params.slug]);
 
-  if (loading) return <p className={s.empty}>Загрузка…</p>;
+  if (loading) return <CollectionPageSkeleton variant="square" />;
   if (err || !data) return <p className={s.error}>{err || "Не найдено"}</p>;
 
   const tracks = data.tracks;

@@ -8,6 +8,7 @@ import { ArtistNameInput } from "@/components/ArtistNameInput/ArtistNameInput";
 import type { Track } from "@/lib/types";
 import { trackArtistNames } from "@/lib/track";
 import page from "@/styles/page.module.scss";
+import { FormPageSkeleton } from "@/components/Skeleton";
 import auth from "@/components/LoginScreen/LoginScreen.module.scss";
 
 const inputStyle: React.CSSProperties = {
@@ -38,6 +39,9 @@ export default function EditTrackPage() {
   const [status, setStatus] = useState("");
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [singleReleaseId, setSingleReleaseId] = useState<string | null>(null);
+  const [singleQuery, setSingleQuery] = useState("");
+  const [singleOptions, setSingleOptions] = useState<Array<{ id: string; title: string; slug: string; year?: number | null }>>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -53,9 +57,28 @@ export default function EditTrackPage() {
         setTrackNumber(t.trackNumber ? String(t.trackNumber) : "");
         setDescription(t.description ?? "");
         setCoverPreview(t.coverUrl ? mediaUrl(t.coverUrl) : null);
+        setSingleReleaseId(t.singleReleaseId ?? null);
+        setSingleQuery(t.singleRelease?.title ?? "");
       })
       .catch((e) => setErr(e.message));
   }, [id]);
+
+  useEffect(() => {
+    if (!singleQuery.trim()) {
+      setSingleOptions([]);
+      return;
+    }
+    const q = singleQuery.trim();
+    const timer = setTimeout(() => {
+      api<Array<{ id: string; title: string; slug: string; year?: number | null }>>(
+        `/api/releases/search?q=${encodeURIComponent(q)}&type=SINGLE&limit=10`,
+        { auth: false }
+      )
+        .then(setSingleOptions)
+        .catch(() => setSingleOptions([]));
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [singleQuery]);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -75,6 +98,7 @@ export default function EditTrackPage() {
           genre: genre.trim() || null,
           trackNumber: trackNumber.trim() ? Number(trackNumber) : null,
           description: description.trim() || null,
+          singleReleaseId: singleReleaseId || null,
         }),
       });
       setStatus("Сохранено");
@@ -123,7 +147,7 @@ export default function EditTrackPage() {
   }
 
   if (err && !track) return <div className={page.error}>{err}</div>;
-  if (!track) return <div className={page.banner} style={{ margin: 24 }}>Загрузка…</div>;
+  if (!track) return <FormPageSkeleton />;
 
   return (
     <div className={page.view}>
@@ -174,6 +198,65 @@ export default function EditTrackPage() {
 
         <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#a0a0a0", fontWeight: 700 }}>Album artist</label>
         <input value={albumArtist} onChange={(e) => setAlbumArtist(e.target.value)} style={inputStyle} />
+
+        <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#a0a0a0", fontWeight: 700 }}>Сингл-релиз</label>
+        <input
+          value={singleQuery}
+          onChange={(e) => {
+            setSingleQuery(e.target.value);
+            setSingleReleaseId(null);
+          }}
+          placeholder="Поиск сингла…"
+          style={inputStyle}
+          list="single-release-options"
+        />
+        <datalist id="single-release-options">
+          {singleOptions.map((r) => (
+            <option key={r.id} value={r.title} />
+          ))}
+        </datalist>
+        {singleOptions.length > 0 && !singleReleaseId && (
+          <div style={{ marginBottom: 12 }}>
+            {singleOptions.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => {
+                  setSingleReleaseId(r.id);
+                  setSingleQuery(r.title);
+                }}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "8px 12px",
+                  marginBottom: 4,
+                  background: "#282828",
+                  borderRadius: 8,
+                  color: "#fff",
+                  fontSize: 13,
+                }}
+              >
+                {r.title}{r.year ? ` (${r.year})` : ""}
+              </button>
+            ))}
+          </div>
+        )}
+        {singleReleaseId && (
+          <div style={{ marginBottom: 12, fontSize: 13, color: "#96FF55" }}>
+            Выбран сингл ·{" "}
+            <button
+              type="button"
+              onClick={() => {
+                setSingleReleaseId(null);
+                setSingleQuery("");
+              }}
+              style={{ color: "#f15e6c", background: "none", fontWeight: 600 }}
+            >
+              сбросить
+            </button>
+          </div>
+        )}
 
         <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#a0a0a0", fontWeight: 700 }}>Описание</label>
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} style={{ ...inputStyle, borderRadius: 12, resize: "vertical" }} />

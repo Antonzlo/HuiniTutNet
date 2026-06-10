@@ -1,17 +1,28 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { api, mediaUrl } from "@/lib/api";
+import { fetchCached, getCached } from "@/lib/queryCache";
 import type { Artist, Track } from "@/lib/types";
 import { fmtTotalDuration, totalDurationSec } from "@/lib/track";
-import { groupReleases, releaseUrl } from "@/lib/release";
+import {
+  buildArtistReleases,
+  filterArtistReleases,
+  releaseLatestAt,
+  releaseShelfCover,
+  releaseUrl,
+  shelfReleaseTypeLabel,
+} from "@/lib/release";
 import { useCoverGradient } from "@/hooks/useCoverGradient";
 import { HiuniTrackList } from "@/components/TrackList/HiuniTrackList";
-import { ArtistAvatar } from "@/components/ArtistAvatar/ArtistAvatar";
 import { ShuffleIcon } from "@/components/icons";
+import overlay from "@/components/ShelfPlayOverlay/ShelfPlayOverlay.module.scss";
+import { ShelfPlayOverlay } from "@/components/ShelfPlayOverlay/ShelfPlayOverlay";
+import { RelatedArtistCard } from "@/components/ArtistShelfCard/RelatedArtistCard";
 import { PlayCollectionButton } from "@/components/PlayCollectionButton";
+import { CollectionPageSkeleton } from "@/components/Skeleton";
 import s from "./artist.module.scss";
 
 type ArtistDetail = Artist & {
@@ -27,8 +38,9 @@ export default function ArtistPage() {
   const [related, setRelated] = useState<Artist[]>([]);
   const [err, setErr] = useState("");
   const [showAllTracks, setShowAllTracks] = useState(false);
-  const [releaseTab, setReleaseTab] = useState<"popular" | "singles">("popular");
   const [following, setFollowing] = useState(false);
+  const [releaseTab, setReleaseTab] = useState<"popular" | "albums" | "singles">("popular");
+  const [showAllReleases, setShowAllReleases] = useState(false);
 
   async function toggleFollow() {
     if (!slug) return;
@@ -39,29 +51,50 @@ export default function ArtistPage() {
       } else {
         await api(`/api/artists/${slug}/follow`, { method: "POST" });
         setFollowing(true);
+        window.dispatchEvent(new CustomEvent("hiuni:home-invalidate"));
       }
     } catch {
       /* ignore */
     }
   }
 
+  useLayoutEffect(() => {
+    if (!slug) return;
+    const cachedArtist = getCached<ArtistDetail>(`artist:${slug}`, 30 * 60_000);
+    const cachedRelated = getCached<Artist[]>(`artist-related:${slug}`, 30 * 60_000);
+    if (cachedArtist) {
+      setArtist(cachedArtist);
+      setFollowing(Boolean(cachedArtist.following));
+    }
+    if (cachedRelated) setRelated(cachedRelated);
+  }, [slug]);
+
   useEffect(() => {
     if (!slug) return;
-    Promise.all([
-      api<ArtistDetail>(`/api/artists/${slug}`),
-      api<Artist[]>(`/api/artists`, { auth: false }),
-    ])
-      .then(([a, all]) => {
+    setErr("");
+
+    fetchCached(
+      `artist:${slug}`,
+      30 * 60_000,
+      () => api<ArtistDetail>(`/api/artists/${slug}`),
+      { revalidate: Boolean(getCached(`artist:${slug}`, 30 * 60_000)) }
+    )
+      .then((a) => {
         setArtist(a);
         setFollowing(Boolean(a.following));
-        setRelated(
-          all
-            .filter((x) => x.slug !== slug)
-            .sort((x, y) => (y._count?.tracks ?? 0) - (x._count?.tracks ?? 0))
-            .slice(0, 11)
-        );
       })
-      .catch((e) => setErr(e.message));
+      .catch((e) => {
+        if (!getCached(`artist:${slug}`, 30 * 60_000)) setErr(e.message);
+      });
+
+    fetchCached(
+      `artist-related:${slug}`,
+      30 * 60_000,
+      () => api<Artist[]>(`/api/artists/${slug}/related`, { auth: false }),
+      { revalidate: Boolean(getCached(`artist-related:${slug}`, 30 * 60_000)) }
+    )
+      .then(setRelated)
+      .catch(() => {});
   }, [slug]);
 
   const tracks = useMemo(() => {
@@ -78,18 +111,30 @@ export default function ArtistPage() {
     [tracks]
   );
 
-  const releases = useMemo(() => groupReleases(tracks), [tracks]);
-  const filteredReleases = useMemo(() => {
-    if (releaseTab === "singles") return releases.filter((r) => r.isSingle);
-    return releases.filter((r) => !r.isSingle);
-  }, [releases, releaseTab]);
+  const allReleases = useMemo(() => buildArtistReleases(tracks), [tracks]);
+  const filteredReleases = useMemo(
+    () => filterArtistReleases(allReleases, releaseTab),
+    [allReleases, releaseTab]
+  );
+  const latestReleaseKey = useMemo(() => {
+    let key: string | null = null;
+    let best = 0;
+    for (const r of allReleases) {
+      const at = releaseLatestAt(r);
+      if (at > best) {
+        best = at;
+        key = r.key;
+      }
+    }
+    return key;
+  }, [allReleases]);
 
   const heroCoverUrl = useMemo(() => {
     const fromPopular = popular.find((t) => t.coverUrl)?.coverUrl;
     const fromAny = tracks.find((t) => t.coverUrl)?.coverUrl;
-    const fromRelease = releases.find((r) => r.coverUrl)?.coverUrl;
+    const fromRelease = allReleases.map(releaseShelfCover).find(Boolean);
     return fromPopular ?? fromRelease ?? fromAny ?? artist?.imageUrl ?? artist?.avatarUrl ?? null;
-  }, [popular, tracks, releases, artist?.imageUrl, artist?.avatarUrl]);
+  }, [popular, tracks, allReleases, artist?.imageUrl, artist?.avatarUrl]);
 
   const coverSrc = heroCoverUrl ? mediaUrl(heroCoverUrl) : null;
   const { heroStyle } = useCoverGradient(coverSrc);
@@ -107,7 +152,7 @@ export default function ArtistPage() {
   }
 
   if (err) return <div className={s.error}>{err}</div>;
-  if (!artist) return <div className={s.loading}>Загрузка…</div>;
+  if (!artist) return <CollectionPageSkeleton variant="artist" />;
 
   return (
     <div className={s.page}>
@@ -195,10 +240,20 @@ export default function ArtistPage() {
         </aside>
       </div>
 
-      {releases.length > 0 && (
+      {allReleases.length > 0 && (
         <section className={s.music}>
           <div className={s.musicHead}>
             <h2 className={s.sectionTitle}>Музыка</h2>
+            {!showAllReleases && filteredReleases.length > 6 && (
+              <button type="button" className={s.showAllBtn} onClick={() => setShowAllReleases(true)}>
+                Показать все
+              </button>
+            )}
+            {showAllReleases && (
+              <button type="button" className={s.showAllBtn} onClick={() => setShowAllReleases(false)}>
+                Свернуть
+              </button>
+            )}
           </div>
           <div className={s.tabs}>
             <button
@@ -210,28 +265,55 @@ export default function ArtistPage() {
             </button>
             <button
               type="button"
+              className={`${s.tab} ${releaseTab === "albums" ? s.active : ""}`}
+              onClick={() => setReleaseTab("albums")}
+            >
+              Альбомы
+            </button>
+            <button
+              type="button"
               className={`${s.tab} ${releaseTab === "singles" ? s.active : ""}`}
               onClick={() => setReleaseTab("singles")}
             >
               Синглы и EP
             </button>
           </div>
-          <div className={s.releaseGrid}>
-            {filteredReleases.map((r) => (
-              <Link key={r.key} href={releaseUrl(slug!, r)} className={s.releaseCard}>
-                <div className={s.releaseCover}>
-                  {r.coverUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={mediaUrl(r.coverUrl)} alt="" className={s.releaseImg} />
-                  ) : null}
-                </div>
-                <div className={s.releaseTitle}>{r.title}</div>
-                <div className={s.releaseMeta}>
-                  {r.year ? `${r.year} · ` : ""}
-                  {r.isSingle ? "Сингл" : "Альбом"}
-                </div>
-              </Link>
-            ))}
+          <div className={showAllReleases ? s.releaseGrid : s.releaseRow}>
+            {filteredReleases.map((r) => {
+              const cover = releaseShelfCover(r);
+              const isLatest = releaseTab === "popular" && r.key === latestReleaseKey;
+              return (
+                <Link
+                  key={r.key}
+                  href={releaseUrl(slug!, r)}
+                  className={`${s.releaseCard} ${overlay.shelfCard}`}
+                >
+                  <div className={`${s.releaseCover} ${overlay.coverWrap}`}>
+                    {cover ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={mediaUrl(cover)} alt="" className={s.releaseImg} />
+                    ) : null}
+                    <ShelfPlayOverlay
+                      tracks={r.tracks}
+                      contextId={`release:${r.key}`}
+                      aria-label={`Играть ${r.title}`}
+                    />
+                  </div>
+                  <div className={s.releaseTitle}>{r.title}</div>
+                  {isLatest ? (
+                    <>
+                      <div className={s.releaseMeta}>Последний релиз</div>
+                      <div className={s.releaseMetaSub}>{shelfReleaseTypeLabel(r)}</div>
+                    </>
+                  ) : (
+                    <div className={s.releaseMeta}>
+                      {r.year ? `${r.year} · ` : ""}
+                      {shelfReleaseTypeLabel(r)}
+                    </div>
+                  )}
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}
@@ -241,17 +323,7 @@ export default function ArtistPage() {
           <h2 className={s.sectionTitle}>Похожие исполнители</h2>
           <div className={s.relatedGrid}>
             {related.map((a) => (
-              <Link key={a.id} href={`/artists/${a.slug}`} className={s.relatedCard}>
-                <ArtistAvatar
-                  name={a.name}
-                  avatarUrl={a.avatarUrl}
-                  imageUrl={a.imageUrl}
-                  className={s.relatedAvatar}
-                  imgClassName={s.relatedImg}
-                />
-                <div className={s.relatedName}>{a.name}</div>
-                <div className={s.relatedType}>Исполнитель</div>
-              </Link>
+              <RelatedArtistCard key={a.id} artist={a} />
             ))}
           </div>
         </section>

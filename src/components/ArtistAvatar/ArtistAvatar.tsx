@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { mediaUrl } from "@/lib/api";
 import { artistImageUrl } from "@/lib/artist";
 
@@ -10,14 +11,20 @@ type Props = {
 };
 
 export function ArtistAvatar({ name, avatarUrl, imageUrl, className, imgClassName }: Props) {
+  const [broken, setBroken] = useState(false);
   const src = artistImageUrl({ avatarUrl, imageUrl });
   const initial = name[0]?.toUpperCase() ?? "?";
 
-  if (src) {
+  if (src && !broken) {
     return (
       <div className={className}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={mediaUrl(src)} alt="" className={imgClassName} />
+        <img
+          src={mediaUrl(src)}
+          alt=""
+          className={imgClassName}
+          onError={() => setBroken(true)}
+        />
       </div>
     );
   }

@@ -10,6 +10,7 @@ import { MixCover } from "@/components/Home/MixCover";
 import { RadioCover } from "@/components/Home/RadioCover";
 import { PlaylistSaveButton } from "@/components/Home/PlaylistSaveButton";
 import { PlayCollectionButton } from "@/components/PlayCollectionButton";
+import { CollectionPageSkeleton } from "@/components/Skeleton";
 import s from "./mix.module.scss";
 
 export default function MixPage() {
@@ -26,7 +27,7 @@ export default function MixPage() {
       .finally(() => setLoading(false));
   }, [mixId]);
 
-  if (loading) return <p className={s.empty}>Загрузка…</p>;
+  if (loading) return <CollectionPageSkeleton variant="square" />;
   if (err || !data) return <p className={s.error}>{err || "Не найдено"}</p>;
 
   const tracks = data.tracks;

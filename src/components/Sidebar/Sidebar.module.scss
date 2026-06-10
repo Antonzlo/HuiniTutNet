@@ -19,13 +19,18 @@
   }
 
   &.fullscreen {
-    flex: 1;
-    flex-direction: row;
+    flex: 1 1 0;
+    flex-shrink: 1;
+    flex-direction: column;
     align-items: stretch;
-    gap: 8px;
-    width: auto;
+    width: 0;
     min-width: 0;
-    max-width: calc(100% - 16px);
-    padding-bottom: calc($player-height + 8px);
+    max-width: none;
+
+    > * {
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+    }
   }
 }

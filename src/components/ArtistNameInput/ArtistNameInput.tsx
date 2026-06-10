@@ -9,6 +9,7 @@ type Props = {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  inputClassName?: string;
 };
 
 function currentSegment(value: string, cursor: number) {
@@ -22,7 +23,7 @@ function currentSegment(value: string, cursor: number) {
   };
 }
 
-export function ArtistNameInput({ value, onChange, placeholder }: Props) {
+export function ArtistNameInput({ value, onChange, placeholder, inputClassName }: Props) {
   const [artists, setArtists] = useState<Artist[]>([]);
   const [open, setOpen] = useState(false);
   const [cursor, setCursor] = useState(0);
@@ -88,7 +89,7 @@ export function ArtistNameInput({ value, onChange, placeholder }: Props) {
   return (
     <div className={styles.wrap} ref={wrapRef}>
       <input
-        className={styles.input}
+        className={inputClassName ? `${styles.input} ${inputClassName}` : styles.input}
         value={value}
         placeholder={placeholder}
         onChange={(e) => {

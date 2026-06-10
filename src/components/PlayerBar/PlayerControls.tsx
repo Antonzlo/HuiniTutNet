@@ -17,7 +17,7 @@ type Props = {
 };
 
 function fmt(sec: number) {
-  if (!Number.isFinite(sec)) return "0:00";
+  if (!Number.isFinite(sec) || sec < 0) return "0:00";
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
   return `${m}:${s.toString().padStart(2, "0")}`;
@@ -52,7 +52,7 @@ export function PlayerControls({ size = "sm", showProgress = true }: Props) {
           disabled={!hasTrack}
           aria-label="Назад"
         >
-          <PrevIcon size={lg ? 22 : 16} />
+          <PrevIcon size={lg ? 22 : 20} tone="primary" />
         </button>
         <button
           type="button"
@@ -62,9 +62,9 @@ export function PlayerControls({ size = "sm", showProgress = true }: Props) {
           aria-label={isPlaying ? "Пауза" : "Играть"}
         >
           {isPlaying ? (
-            <PauseIcon size={lg ? 22 : 16} tone="dark" />
+            <PauseIcon size={lg ? 24 : 20} tone="dark" />
           ) : (
-            <PlayIcon size={lg ? 22 : 16} tone="dark" />
+            <PlayIcon size={lg ? 24 : 20} tone="dark" />
           )}
         </button>
         <button
@@ -74,7 +74,7 @@ export function PlayerControls({ size = "sm", showProgress = true }: Props) {
           disabled={!hasTrack}
           aria-label="Вперёд"
         >
-          <NextIcon size={lg ? 22 : 16} />
+          <NextIcon size={lg ? 22 : 20} tone="primary" />
         </button>
         <button type="button" className={styles.iconBtn} aria-label="Repeat" disabled>
           <RepeatIcon tone="muted" size={lg ? 20 : 16} />
@@ -85,6 +85,7 @@ export function PlayerControls({ size = "sm", showProgress = true }: Props) {
           <span className={styles.time}>{fmt(currentTime)}</span>
           <div className={styles.progressWrap}>
             <div className={styles.progressFill} style={{ width: `${progress}%` }} />
+            <span className={styles.progressThumb} style={{ left: `${progress}%` }} />
             <input
               type="range"
               min={0}

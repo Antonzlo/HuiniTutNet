@@ -1,26 +1,28 @@
 @use 'styles/variables' as *;
 
-.player {
+.root {
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-columns: minmax(180px, 1fr) minmax(480px, 2fr) minmax(180px, 1fr);
   align-items: center;
   gap: 16px;
+  width: 100%;
   height: 100%;
   padding: 0 16px;
-  background: transparent;
 }
 
 .left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
+  justify-self: start;
 }
 
-.artworkBtn {
+.coverBtn {
   padding: 0;
   border: none;
   background: none;
+  flex-shrink: 0;
   cursor: pointer;
 
   &:disabled {
@@ -28,41 +30,25 @@
   }
 }
 
-.artwork {
+.cover {
   width: 56px;
   height: 56px;
   border-radius: $radius-sm;
   background: $bg-tertiary;
-  flex-shrink: 0;
   overflow: hidden;
-  animation: artIn 0.35s ease;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.25s ease;
-  }
-}
-
-.artworkBtn:hover:not(:disabled) img {
-  transform: scale(1.05);
-}
-
-@keyframes artIn {
-  from {
-    opacity: 0.4;
-    transform: scale(0.94);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
+    display: block;
   }
 }
 
 .meta {
   min-width: 0;
-  flex: 1;
+  flex: 0 1 auto;
+  max-width: calc(100% - 56px - 32px - 16px);
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -75,7 +61,7 @@
   text-align: left;
   cursor: pointer;
   min-width: 0;
-  width: 100%;
+  max-width: 100%;
 
   &:disabled {
     cursor: default;
@@ -98,7 +84,6 @@
 
 .titleLink {
   display: block;
-  min-width: 0;
   text-decoration: none;
 
   &:hover {
@@ -117,6 +102,15 @@
 .artistLinks {
   font-size: 11px;
   color: $text-secondary;
+
+  a {
+    color: inherit;
+
+    &:hover {
+      color: $text-primary;
+      text-decoration: underline;
+    }
+  }
 }
 
 .artistFallback {
@@ -131,11 +125,9 @@
   border-radius: $radius-pill;
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: $bg-primary;
+  color: $accent-text;
   background: $accent;
-  vertical-align: middle;
 }
 
 .likeBtn {
@@ -150,7 +142,7 @@
 
   &:hover:not(:disabled) {
     color: $text-primary;
-    transform: scale(1.05);
+    transform: scale(1.06);
   }
 
   &.liked {
@@ -159,14 +151,22 @@
 
   &:disabled {
     opacity: 0.35;
-    cursor: default;
   }
 }
 
 .center {
+  min-width: 0;
+  width: 100%;
   max-width: 720px;
   margin: 0 auto;
-  width: 100%;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
 }
 
 .iconBtn {
@@ -175,6 +175,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
+  flex-shrink: 0;
   color: $text-secondary;
   transition: color $transition-fast, transform $transition-fast;
 
@@ -182,46 +183,112 @@
     color: $text-primary;
     transform: scale(1.06);
   }
-}
 
-.iconBtnActive {
-  color: $accent;
-}
-
-.lyricsBtn {
-  padding: 4px 10px;
-  border-radius: $radius-pill;
-  font-size: 11px;
-  font-weight: 600;
-  color: $text-secondary;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: color $transition-fast, border-color $transition-fast, background $transition-fast;
-
-  &:hover {
-    color: $text-primary;
-    border-color: rgba(255, 255, 255, 0.45);
-    background: rgba(255, 255, 255, 0.06);
+  &.iconBtnActive {
+    color: $accent;
+    background: $accent-muted;
+    border-radius: 50%;
   }
 }
 
-.right {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.volumeWrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 120px;
+.quality {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: $text-secondary;
+  padding: 0 4px;
 }
 
 .volumeSlider {
-  flex: 1;
+  width: 100px;
   height: 4px;
-  accent-color: $text-primary;
+  appearance: none;
+  background: transparent;
   cursor: pointer;
-  max-width: 100px;
+  flex-shrink: 0;
+
+  &::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(
+      to right,
+      $text-primary 0%,
+      $text-primary var(--vol, 85%),
+      rgba(255, 255, 255, 0.3) var(--vol, 85%),
+      rgba(255, 255, 255, 0.3) 100%
+    );
+  }
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    margin-top: -4px;
+    border-radius: 50%;
+    background: $text-primary;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  &:hover::-webkit-slider-thumb,
+  &:focus-visible::-webkit-slider-thumb {
+    opacity: 1;
+  }
+
+  &::-moz-range-track {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  &::-moz-range-progress {
+    height: 4px;
+    border-radius: 2px;
+    background: $text-primary;
+  }
+
+  &::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border: none;
+    border-radius: 50%;
+    background: $text-primary;
+  }
+}
+
+.rootFullscreen {
+  .quality,
+  .volumeSlider {
+    display: block;
+  }
+}
+
+@media (max-width: 1000px) {
+  .root {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr);
+    padding: 0 12px;
+  }
+
+  .quality {
+    display: none;
+  }
+
+  .rootFullscreen .quality {
+    display: block;
+  }
+
+  .volumeSlider {
+    width: 72px;
+  }
+}
+
+@media (max-width: 768px) {
+  .volumeSlider {
+    display: none;
+  }
+
+  .rootFullscreen .volumeSlider {
+    display: block;
+    width: 72px;
+  }
 }

@@ -17,8 +17,23 @@
 }
 
 .panelFullscreen {
-  flex: 1;
+  flex: 1 1 0;
+  width: 100%;
+  min-width: 0;
   border-radius: $radius-lg;
+
+  .list,
+  .compactList {
+    padding-bottom: 8px;
+  }
+
+  .grid {
+    padding-bottom: 8px;
+  }
+
+  .gridLg {
+    padding-bottom: 8px;
+  }
 }
 
 .headerWrap {
@@ -394,6 +409,10 @@
   color: $text-subdued;
 }
 
+.coverWrap {
+  flex-shrink: 0;
+}
+
 .row {
   display: flex;
   align-items: center;
@@ -438,6 +457,33 @@
   flex-shrink: 0;
   color: $accent;
   display: flex;
+}
+
+.rowPlayBtn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: $text-primary;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity $transition-fast, transform $transition-fast, background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: scale(1.05);
+  }
+
+  .row:hover &,
+  .compactRow:hover & {
+    opacity: 1;
+  }
 }
 
 .rowDate {
@@ -576,7 +622,6 @@
 }
 
 .gridCoverWrap {
-  position: relative;
   margin-bottom: 12px;
 }
 

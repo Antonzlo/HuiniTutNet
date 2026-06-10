@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { mediaUrl } from "@/lib/api";
 import type { HomeCard as HomeCardType } from "@/lib/home";
+import overlay from "@/components/ShelfPlayOverlay/ShelfPlayOverlay.module.scss";
+import { ShelfPlayOverlay } from "@/components/ShelfPlayOverlay/ShelfPlayOverlay";
 import { ArtistAvatar } from "@/components/ArtistAvatar/ArtistAvatar";
-import { PlayIcon, PauseIcon } from "@/components/icons";
 import { usePlayer } from "@/context/PlayerContext";
-import { useIdsPlayback } from "@/hooks/useCollectionPlayback";
 import { MixCover } from "./MixCover";
 import { RadioCover } from "./RadioCover";
 import s from "./home.module.scss";
@@ -16,25 +16,22 @@ type Props = {
   onPlay?: (card: HomeCardType) => void;
 };
 
-export function HomeCard({ card, onPlay }: Props) {
-  const { togglePlay } = usePlayer();
-  const isCircle = card.shape === "circle";
-  const playOnCard = Boolean(
-    card.trackIds?.length && onPlay && card.kind !== "mix" && card.kind !== "radio"
-  );
-  const showPlayBtn = Boolean(card.trackIds?.length && onPlay);
-  const { isActive, showPause } = useIdsPlayback(showPlayBtn ? card.trackIds : undefined);
+function canPlayCard(card: HomeCardType, onPlay?: (card: HomeCardType) => void) {
+  if (!onPlay) return false;
+  if (card.trackIds?.length) return true;
+  return card.kind === "artist" || card.kind === "mix" || card.kind === "radio";
+}
 
-  function handlePlay(e?: React.MouseEvent) {
-    e?.preventDefault();
-    e?.stopPropagation();
-    if (!onPlay) return;
-    if (isActive) togglePlay();
-    else onPlay(card);
-  }
+export function HomeCard({ card, onPlay }: Props) {
+  const { queueContextId } = usePlayer();
+  const isCircle = card.shape === "circle";
+  const canPlay = canPlayCard(card, onPlay);
+  const isActive = canPlay && queueContextId === card.id;
 
   const cover = (
-    <div className={`${s.coverWrap} ${isCircle ? s.coverWrapCircle : ""}`}>
+    <div
+      className={`${s.coverWrap} ${overlay.coverWrap} ${isCircle ? `${s.coverWrapCircle} ${overlay.coverWrapRound}` : ""}`}
+    >
       {(card.kind === "mix" || card.kind === "radio") && card.imageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={mediaUrl(card.imageUrl)} alt="" className={s.coverImg} />
@@ -57,15 +54,15 @@ export function HomeCard({ card, onPlay }: Props) {
       ) : (
         <div className={s.coverFallback}>{card.title[0]?.toUpperCase() ?? "?"}</div>
       )}
-      {showPlayBtn && (
-        <span
-          className={s.playOverlay}
-          role={playOnCard ? undefined : "button"}
-          aria-label={showPause ? `Пауза ${card.title}` : `Играть ${card.title}`}
-          onClick={playOnCard ? undefined : handlePlay}
-        >
-          {showPause ? <PauseIcon size={18} tone="dark" /> : <PlayIcon size={18} tone="dark" />}
-        </span>
+      {canPlay && (
+        <ShelfPlayOverlay
+          trackIds={card.trackIds}
+          onPlay={() => onPlay?.(card)}
+          contextId={card.id}
+          round={isCircle}
+          forceVisible={isActive}
+          aria-label={`Играть ${card.title}`}
+        />
       )}
     </div>
   );
@@ -77,19 +74,11 @@ export function HomeCard({ card, onPlay }: Props) {
     </div>
   );
 
-  const cardClass = `${s.card} ${isCircle ? s.cardCircle : ""} ${isActive ? s.cardActive : ""}`;
-
-  if (playOnCard) {
-    return (
-      <button type="button" className={cardClass} onClick={() => handlePlay()}>
-        {cover}
-        {meta}
-      </button>
-    );
-  }
-
   return (
-    <Link href={card.href} className={cardClass}>
+    <Link
+      href={card.href}
+      className={`${s.card} ${overlay.shelfCard} ${isCircle ? s.cardCircle : ""} ${isActive ? s.cardActive : ""}`}
+    >
       {cover}
       {meta}
     </Link>

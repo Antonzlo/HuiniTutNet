@@ -10,11 +10,15 @@ import {
   filterLibraryItems,
   fmtAddedAt,
   isLibraryItemActive,
+  isLibraryItemPlaying,
   searchLibraryItems,
   sortLibraryItems,
   type LibraryItem,
 } from "@/lib/library";
-import { LibraryCover } from "./LibraryCover";
+import overlay from "@/components/ShelfPlayOverlay/ShelfPlayOverlay.module.scss";
+import { LibraryPlayableCover } from "./LibraryPlayableCover";
+import { LibraryRowPlayButton } from "./LibraryRowPlayButton";
+import { LibraryListSkeleton } from "@/components/Skeleton";
 import s from "./LibraryPanel.module.scss";
 
 function PlayingIcon() {
@@ -35,14 +39,15 @@ function PinIcon() {
 
 type ItemProps = {
   item: LibraryItem;
-  active: boolean;
+  navActive: boolean;
+  playing: boolean;
   showDate?: boolean;
 };
 
-function ListRow({ item, active, showDate }: ItemProps) {
+function ListRow({ item, navActive, playing, showDate }: ItemProps) {
   return (
-    <Link href={item.href} className={`${s.row} ${active ? s.rowActive : ""}`}>
-      <LibraryCover item={item} size={48} />
+    <Link href={item.href} className={`${s.row} ${overlay.shelfCard} ${navActive ? s.rowActive : ""}`}>
+      <LibraryPlayableCover item={item} active={playing} size={48} />
       <div className={s.rowText}>
         <div className={s.rowTitle}>{item.title}</div>
         <div className={s.rowSub}>
@@ -50,7 +55,7 @@ function ListRow({ item, active, showDate }: ItemProps) {
           {item.subtitle}
         </div>
       </div>
-      {active && (
+      {playing && (
         <span className={s.rowPlaying} aria-label="Сейчас играет">
           <PlayingIcon />
         </span>
@@ -60,33 +65,35 @@ function ListRow({ item, active, showDate }: ItemProps) {
   );
 }
 
-function CompactRow({ item, active, showDate }: ItemProps) {
+function CompactRow({ item, navActive, playing, showDate }: ItemProps) {
   const type = item.subtitle.split("•")[0]?.trim() ?? item.subtitle;
   return (
-    <Link href={item.href} className={`${s.compactRow} ${active ? s.rowActive : ""}`}>
+    <Link href={item.href} className={`${s.compactRow} ${navActive ? s.rowActive : ""}`}>
       <span className={s.compactTitle}>
         {item.pinned && <PinIcon />}
         {item.title}
       </span>
       <span className={s.compactDot}>•</span>
       <span className={s.compactType}>{type}</span>
-      {active && <span className={s.rowPlaying}><PlayingIcon /></span>}
+      <LibraryRowPlayButton item={item} />
+      {playing && <span className={s.rowPlaying}><PlayingIcon /></span>}
       {showDate && <span className={s.rowDate}>{fmtAddedAt(item.addedAt)}</span>}
     </Link>
   );
 }
 
-function GridCard({ item, active, large }: ItemProps & { large?: boolean }) {
+function GridCard({ item, navActive, playing, large }: ItemProps & { large?: boolean }) {
   return (
-    <Link href={item.href} className={`${s.gridCard} ${large ? s.gridCardLg : ""} ${active ? s.active : ""}`}>
-      <div className={s.gridCoverWrap}>
-        <LibraryCover item={item} className={large ? s.gridCoverLg : s.gridCover} />
-        {active && (
-          <span className={s.playingBadge} aria-label="Сейчас играет">
-            <PlayingIcon />
-          </span>
-        )}
-      </div>
+    <Link
+      href={item.href}
+      className={`${s.gridCard} ${overlay.shelfCard} ${large ? s.gridCardLg : ""} ${navActive ? s.active : ""}`}
+    >
+      <LibraryPlayableCover
+        item={item}
+        active={playing}
+        wrapClassName={s.gridCoverWrap}
+        className={large ? s.gridCoverLg : s.gridCover}
+      />
       <div className={s.gridTitle}>{item.title}</div>
       <div className={s.gridSub}>{item.subtitle}</div>
     </Link>
@@ -97,7 +104,7 @@ export function LibraryContent() {
   const pathname = usePathname();
   const { filter, search, sort, view, isFullscreen } = useLibrary();
   const { items, loading } = useLibraryItems();
-  const { currentTrack } = usePlayer();
+  const { queueContextId } = usePlayer();
 
   const visible = useMemo(
     () => sortLibraryItems(searchLibraryItems(filterLibraryItems(items, filter), search), sort),
@@ -106,7 +113,7 @@ export function LibraryContent() {
 
   const showDate = isFullscreen && (view === "list" || view === "compact");
 
-  if (loading && items.length === 0) return <div className={s.listEmpty}>Загрузка…</div>;
+  if (loading && items.length === 0) return <LibraryListSkeleton />;
   if (visible.length === 0) {
     return (
       <div className={s.listEmpty}>
@@ -123,7 +130,8 @@ export function LibraryContent() {
           <GridCard
             key={item.id}
             item={item}
-            active={isLibraryItemActive(item, pathname, currentTrack)}
+            navActive={isLibraryItemActive(item, pathname)}
+            playing={isLibraryItemPlaying(item, queueContextId)}
             large={view === "grid-lg"}
           />
         ))}
@@ -144,7 +152,8 @@ export function LibraryContent() {
           <CompactRow
             key={item.id}
             item={item}
-            active={isLibraryItemActive(item, pathname, currentTrack)}
+            navActive={isLibraryItemActive(item, pathname)}
+            playing={isLibraryItemPlaying(item, queueContextId)}
             showDate={showDate}
           />
         ))}
@@ -164,7 +173,8 @@ export function LibraryContent() {
         <ListRow
           key={item.id}
           item={item}
-          active={isLibraryItemActive(item, pathname, currentTrack)}
+          navActive={isLibraryItemActive(item, pathname)}
+          playing={isLibraryItemPlaying(item, queueContextId)}
           showDate={showDate}
         />
       ))}

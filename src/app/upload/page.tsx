@@ -1,9 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { getToken } from "@/lib/api";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { api, getToken } from "@/lib/api";
+import type { DbRelease } from "@/lib/release";
+import { canonicalReleaseUrl, releaseTypeLabel } from "@/lib/release";
 import { ArtistNameInput } from "@/components/ArtistNameInput/ArtistNameInput";
-import type { InspectedAudio } from "@/lib/types";
+import type { InspectedAudio, ReleaseType } from "@/lib/types";
 import { pairLrcWithAudio, splitUploadFiles } from "@/lib/upload-files";
 import page from "@/styles/page.module.scss";
 import auth from "@/components/LoginScreen/LoginScreen.module.scss";
@@ -53,18 +57,19 @@ function formatApiError(data: unknown): string {
 function fmtDuration(sec?: number) {
   if (!sec || !Number.isFinite(sec)) return "—";
   const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
+  const ss = Math.floor(sec % 60);
+  return `${m}:${ss.toString().padStart(2, "0")}`;
 }
 
 function buildEdit(inspect: InspectedAudio, audio: File): QueueEdit {
+  const stem = audio.name.replace(/\.[^.]+$/, "");
   const artists =
     inspect.suggestedArtists?.join(", ") ||
     inspect.suggestedArtist ||
     inspect.artist ||
     "";
   return {
-    title: inspect.suggestedTitle || inspect.title || audio.name.replace(/\.[^.]+$/, ""),
+    title: inspect.title ?? inspect.suggestedTitle ?? stem,
     artistName: artists,
     album: inspect.album ?? "",
     albumArtist: inspect.albumArtist ?? "",
@@ -75,11 +80,97 @@ function buildEdit(inspect: InspectedAudio, audio: File): QueueEdit {
   };
 }
 
+const RELEASE_TYPES: ReleaseType[] = ["SINGLE", "EP", "ALBUM", "COMPILATION"];
+
+type BatchPublish = {
+  releaseType: ReleaseType;
+  releaseTitle: string;
+  year: string;
+  albumArtist: string;
+};
+
+function guessBatchPublish(items: QueueItem[]): BatchPublish {
+  const ready = items.filter((q) => q.status === "ready");
+  const albums = [...new Set(ready.map((q) => q.edit.album.trim()).filter(Boolean))];
+  const years = [...new Set(ready.map((q) => q.edit.year.trim()).filter(Boolean))];
+  const albumArtists = [...new Set(ready.map((q) => q.edit.albumArtist.trim()).filter(Boolean))];
+  const count = ready.length;
+  let releaseType: ReleaseType = "ALBUM";
+  if (count === 1) releaseType = "SINGLE";
+  else if (count <= 6) releaseType = "EP";
+
+  const releaseTitle =
+    albums.length === 1
+      ? albums[0]!
+      : count === 1
+        ? ready[0]!.edit.title.trim()
+        : "";
+
+  return {
+    releaseType,
+    releaseTitle,
+    year: years.length === 1 ? years[0]! : "",
+    albumArtist: albumArtists.length === 1 ? albumArtists[0]! : "",
+  };
+}
+
+function statusBadge(item: QueueItem) {
+  switch (item.status) {
+    case "inspecting":
+      return <span className={`${s.badge} ${s.badgeBusy}`}>читаем…</span>;
+    case "uploading":
+      return <span className={`${s.badge} ${s.badgeBusy}`}>загрузка…</span>;
+    case "done":
+      return <span className={`${s.badge} ${s.badgeDone}`}>✓</span>;
+    case "error":
+      return <span className={`${s.badge} ${s.badgeError}`}>ошибка</span>;
+    case "ready":
+      return (
+        <span className={`${s.badge} ${s.badgeReady}`}>
+          {item.expanded ? "свернуть" : "редактировать"}
+        </span>
+      );
+    default:
+      return <span className={`${s.badge} ${s.badgeBusy}`}>ожидание</span>;
+  }
+}
+
 export default function UploadPage() {
+  const searchParams = useSearchParams();
+  const releaseId = searchParams.get("releaseId")?.trim() ?? "";
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const dragDepth = useRef(0);
+
+  const [targetRelease, setTargetRelease] = useState<DbRelease | null>(null);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [busy, setBusy] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
   const [err, setErr] = useState("");
   const [summary, setSummary] = useState("");
+  const [publish, setPublish] = useState<BatchPublish>({
+    releaseType: "ALBUM",
+    releaseTitle: "",
+    year: "",
+    albumArtist: "",
+  });
+
+  useEffect(() => {
+    if (!releaseId) {
+      setTargetRelease(null);
+      return;
+    }
+    api<DbRelease>(`/api/releases/${releaseId}`, { auth: false })
+      .then((r) => {
+        setTargetRelease(r);
+        setPublish({
+          releaseType: r.type,
+          releaseTitle: r.title,
+          year: r.year ? String(r.year) : "",
+          albumArtist: r.albumArtist ?? "",
+        });
+      })
+      .catch(() => setErr("Не удалось загрузить релиз"));
+  }, [releaseId]);
 
   function patchItem(id: string, patch: Partial<QueueItem>) {
     setQueue((prev) => prev.map((q) => (q.id === id ? { ...q, ...patch } : q)));
@@ -117,10 +208,16 @@ export default function UploadPage() {
         return null;
       }
       const inspect = data as InspectedAudio;
+      const edit = buildEdit(inspect, item.audio);
+      if (targetRelease) {
+        edit.album = targetRelease.title;
+        edit.albumArtist = targetRelease.albumArtist ?? edit.albumArtist;
+        if (targetRelease.year) edit.year = String(targetRelease.year);
+      }
       patchItem(item.id, {
         status: "ready",
         inspect,
-        edit: buildEdit(inspect, item.audio),
+        edit,
         error: undefined,
       });
       return inspect;
@@ -130,21 +227,21 @@ export default function UploadPage() {
     }
   }
 
-  async function onFilesChange(fileList: FileList | null) {
-    if (!fileList?.length) return;
+  async function processFiles(fileList: File[]) {
+    if (!fileList.length) return;
     setErr("");
-    setSummary("");
+    if (queue.every((q) => q.status === "done")) setSummary("");
 
-    const files = [...fileList];
-    const { audio, lrc } = splitUploadFiles(files);
+    const { audio, lrc } = splitUploadFiles(fileList);
     if (audio.length === 0) {
-      setErr("Выбери хотя бы один аудиофайл");
+      setErr("Добавь хотя бы один аудиофайл");
       return;
     }
 
     const paired = pairLrcWithAudio(audio, lrc);
+    const base = Date.now();
     const items: QueueItem[] = audio.map((a, i) => ({
-      id: `${Date.now()}-${i}`,
+      id: `${base}-${i}`,
       audio: a,
       lrc: paired.get(a) ?? null,
       inspect: null,
@@ -153,13 +250,65 @@ export default function UploadPage() {
       status: "pending" as const,
     }));
 
-    setQueue(items);
+    setQueue((prev) => [...prev.filter((q) => q.status !== "done"), ...items]);
     setBusy(true);
     for (const item of items) {
       await inspectOne(item);
     }
     setBusy(false);
   }
+
+  function onDragEnter(e: React.DragEvent) {
+    e.preventDefault();
+    dragDepth.current += 1;
+    setDragOver(true);
+  }
+
+  function onDragLeave(e: React.DragEvent) {
+    e.preventDefault();
+    dragDepth.current -= 1;
+    if (dragDepth.current <= 0) {
+      dragDepth.current = 0;
+      setDragOver(false);
+    }
+  }
+
+  function onDragOver(e: React.DragEvent) {
+    e.preventDefault();
+  }
+
+  function onDrop(e: React.DragEvent) {
+    e.preventDefault();
+    dragDepth.current = 0;
+    setDragOver(false);
+    void processFiles([...e.dataTransfer.files]);
+  }
+
+  useEffect(() => {
+    if (targetRelease) return;
+    const ready = queue.filter((q) => q.status === "ready");
+    if (ready.length === 0) return;
+    setPublish((prev) => (prev.releaseTitle ? prev : guessBatchPublish(queue)));
+  }, [queue, targetRelease]);
+
+  useEffect(() => {
+    if (!targetRelease) return;
+    setQueue((prev) =>
+      prev.map((q) =>
+        q.status === "ready"
+          ? {
+              ...q,
+              edit: {
+                ...q.edit,
+                album: targetRelease.title,
+                albumArtist: targetRelease.albumArtist ?? q.edit.albumArtist,
+                year: targetRelease.year ? String(targetRelease.year) : q.edit.year,
+              },
+            }
+          : q
+      )
+    );
+  }, [targetRelease]);
 
   async function uploadOne(item: QueueItem): Promise<boolean> {
     const token = getToken();
@@ -181,6 +330,17 @@ export default function UploadPage() {
     if (edit.genre.trim()) fd.append("genre", edit.genre.trim());
     if (edit.trackNumber.trim()) fd.append("trackNumber", edit.trackNumber.trim());
     if (edit.description.trim()) fd.append("description", edit.description.trim());
+    fd.append("releaseType", publish.releaseType);
+    const releaseTitle =
+      publish.releaseTitle.trim() ||
+      edit.album.trim() ||
+      (publish.releaseType === "SINGLE" ? edit.title.trim() : "");
+    if (releaseTitle) fd.append("releaseTitle", releaseTitle);
+    const batchYear = publish.year.trim() || edit.year.trim();
+    if (batchYear) fd.append("year", batchYear);
+    const batchAlbumArtist = publish.albumArtist.trim() || edit.albumArtist.trim();
+    if (batchAlbumArtist) fd.append("albumArtist", batchAlbumArtist);
+    if (targetRelease) fd.append("releaseId", targetRelease.id);
 
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 600_000);
@@ -242,32 +402,142 @@ export default function UploadPage() {
 
   const readyCount = queue.filter((q) => q.status === "ready").length;
   const doneCount = queue.filter((q) => q.status === "done").length;
+  const activeQueue = queue.filter((q) => q.status !== "done");
 
   return (
     <div className={page.view}>
       <div className={page.hero}>
-        <h1 className={page.heroTitle}>Загрузить</h1>
-        <p className={page.heroSub}>
-          Выбери треки и .lrc — нажми на строку, чтобы отредактировать метаданные перед загрузкой.
+        <h1 className={page.heroTitle}>
+          {targetRelease ? "Добавить трек в релиз" : "Загрузить"}
+        </h1>
+        <p className={`${page.heroSub} ${s.heroSub}`}>
+          {targetRelease ? (
+            <>
+              Релиз: <strong>{targetRelease.title}</strong> ({releaseTypeLabel(targetRelease.type)})
+              {" · "}
+              <Link href={`/releases/${targetRelease.slug}/edit`} className={s.link}>
+                вернуться к редактированию
+              </Link>
+            </>
+          ) : (
+            "Перетащи аудио и .lrc сюда или выбери файлы — метаданные можно поправить перед публикацией."
+          )}
         </p>
       </div>
 
-      <div className={auth.card} style={{ maxWidth: 720, margin: "0 auto 32px", alignItems: "stretch" }}>
-        <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#a0a0a0", fontWeight: 700 }}>
-          Файлы *
-        </label>
-        <input
-          id="track-files"
-          type="file"
-          multiple
-          accept=".flac,.mp3,.wav,.ogg,.aac,.m4a,.lrc,audio/*,text/plain"
-          onChange={(e) => void onFilesChange(e.target.files)}
-          style={{ marginBottom: 16, color: "#ccc", width: "100%" }}
-        />
+      <div className={s.layout}>
+        <aside className={s.card}>
+          <h2 className={s.sectionTitle}>Файлы</h2>
 
-        {queue.length > 0 && (
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+          <div
+            className={`${s.dropzone} ${dragOver ? s.dropzoneActive : ""}`}
+            onClick={() => fileInputRef.current?.click()}
+            onDragEnter={onDragEnter}
+            onDragLeave={onDragLeave}
+            onDragOver={onDragOver}
+            onDrop={onDrop}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                fileInputRef.current?.click();
+              }
+            }}
+            role="button"
+            tabIndex={0}
+          >
+            <span className={s.dropzoneIcon}>↑</span>
+            <span className={s.dropzoneTitle}>
+              {dragOver ? "Отпусти файлы" : "Перетащи сюда"}
+            </span>
+            <span className={s.dropzoneSub}>
+              FLAC, MP3, WAV, OGG, AAC, M4A и .lrc
+              <br />
+              или нажми, чтобы выбрать
+            </span>
+          </div>
+
+          <input
+            ref={fileInputRef}
+            className={s.hiddenInput}
+            type="file"
+            multiple
+            accept=".flac,.mp3,.wav,.ogg,.aac,.m4a,.lrc,audio/*,text/plain"
+            onChange={(e) => {
+              void processFiles(e.target.files ? [...e.target.files] : []);
+              e.target.value = "";
+            }}
+          />
+
+          <p className={s.dropzoneHint}>
+            ID3-теги важнее имени файла. Имя используется только если в тегах нет артиста или названия.
+          </p>
+
+          {readyCount > 0 && !targetRelease && (
+            <div className={s.publish}>
+              <h2 className={s.sectionTitle}>Публикация</h2>
+              <div className={s.publishGrid}>
+                <div className={s.field}>
+                  <span className={s.fieldLabel}>Тип релиза</span>
+                  <select
+                    className={s.select}
+                    value={publish.releaseType}
+                    onChange={(e) =>
+                      setPublish((p) => ({ ...p, releaseType: e.target.value as ReleaseType }))
+                    }
+                  >
+                    {RELEASE_TYPES.map((t) => (
+                      <option key={t} value={t}>
+                        {releaseTypeLabel(t)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className={s.field}>
+                  <span className={s.fieldLabel}>Год релиза</span>
+                  <input
+                    className={s.input}
+                    value={publish.year}
+                    onChange={(e) => setPublish((p) => ({ ...p, year: e.target.value }))}
+                  />
+                </div>
+              </div>
+              <div className={s.field}>
+                <span className={s.fieldLabel}>Название релиза</span>
+                <input
+                  className={s.input}
+                  value={publish.releaseTitle}
+                  onChange={(e) => setPublish((p) => ({ ...p, releaseTitle: e.target.value }))}
+                  placeholder={
+                    publish.releaseType === "SINGLE" ? "Название сингла" : "Название альбома / сборника"
+                  }
+                />
+              </div>
+              {(publish.releaseType === "COMPILATION" || publish.albumArtist) && (
+                <div className={s.field}>
+                  <span className={s.fieldLabel}>Album artist (VA)</span>
+                  <input
+                    className={s.input}
+                    value={publish.albumArtist}
+                    onChange={(e) => setPublish((p) => ({ ...p, albumArtist: e.target.value }))}
+                    placeholder="Various Artists"
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {readyCount > 0 && targetRelease && (
+            <div className={s.targetBanner}>
+              Треки будут добавлены в «{targetRelease.title}». Настройки релиза — на странице{" "}
+              <Link href={`/releases/${targetRelease.slug}/edit`} className={s.link}>
+                редактирования
+              </Link>
+              .
+            </div>
+          )}
+
+          {activeQueue.length > 0 && (
+            <div className={s.actions}>
               <button
                 type="button"
                 className={auth.loginBtn}
@@ -282,128 +552,145 @@ export default function UploadPage() {
                 </button>
               )}
             </div>
+          )}
+        </aside>
 
-            <div className={s.queue}>
-              {queue.map((item) => (
-                <div key={item.id} className={s.row}>
-                  <div
-                    className={`${s.head} ${item.expanded ? s.headExpanded : ""}`}
-                    onClick={() => item.status === "ready" && toggleExpanded(item.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        if (item.status === "ready") toggleExpanded(item.id);
-                      }
-                    }}
-                    role="button"
-                    tabIndex={item.status === "ready" ? 0 : -1}
-                  >
-                    {item.inspect?.coverPreview ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={item.inspect.coverPreview} alt="" className={s.thumb} />
-                    ) : (
-                      <div className={s.thumb} />
-                    )}
-                    <div className={s.meta}>
-                      <div className={s.title}>{item.edit.title || item.audio.name}</div>
-                      <div className={s.sub}>
-                        {item.edit.artistName || "—"} · {item.audio.name}
-                        {item.inspect && ` · ${fmtDuration(item.inspect.durationSec)}`}
-                      </div>
-                      {item.error && <div className={s.error}>{item.error}</div>}
-                    </div>
-                    <div className={s.side}>
-                      {item.lrc ? <span className={s.lrc}>LRC</span> : <span>—</span>}
-                      <div className={s.status}>
-                        {item.status === "inspecting" && "читаем…"}
-                        {item.status === "uploading" && "загрузка…"}
-                        {item.status === "done" && "✓"}
-                        {item.status === "ready" && (item.expanded ? "свернуть" : "редактировать")}
-                        {item.status === "error" && "ошибка"}
-                        {item.status === "pending" && "ожидание"}
-                      </div>
-                    </div>
-                  </div>
-
-                  {item.expanded && item.status === "ready" && (
-                    <div className={s.body} onClick={(e) => e.stopPropagation()}>
-                      <div>
-                        <span className={s.fieldLabel}>Артисты</span>
-                        <ArtistNameInput
-                          value={item.edit.artistName}
-                          onChange={(v) => patchEdit(item.id, { artistName: v })}
-                          placeholder="5opka, илюха реп"
-                        />
-                      </div>
-                      <div>
-                        <span className={s.fieldLabel}>Название</span>
-                        <input
-                          className={s.input}
-                          value={item.edit.title}
-                          onChange={(e) => patchEdit(item.id, { title: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <span className={s.fieldLabel}>Альбом</span>
-                        <input
-                          className={s.input}
-                          value={item.edit.album}
-                          onChange={(e) => patchEdit(item.id, { album: e.target.value })}
-                        />
-                      </div>
-                      <div className={s.grid2}>
-                        <div>
-                          <span className={s.fieldLabel}>Год</span>
-                          <input
-                            className={s.input}
-                            value={item.edit.year}
-                            onChange={(e) => patchEdit(item.id, { year: e.target.value })}
-                          />
-                        </div>
-                        <div>
-                          <span className={s.fieldLabel}>№ трека</span>
-                          <input
-                            className={s.input}
-                            value={item.edit.trackNumber}
-                            onChange={(e) => patchEdit(item.id, { trackNumber: e.target.value })}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <span className={s.fieldLabel}>Жанр</span>
-                        <input
-                          className={s.input}
-                          value={item.edit.genre}
-                          onChange={(e) => patchEdit(item.id, { genre: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <span className={s.fieldLabel}>Описание</span>
-                        <textarea
-                          className={s.textarea}
-                          value={item.edit.description}
-                          onChange={(e) => patchEdit(item.id, { description: e.target.value })}
-                          rows={2}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+        <div className={s.main}>
+          {activeQueue.length === 0 ? (
+            <div className={s.mainEmpty}>
+              {busy
+                ? "Читаем метаданные…"
+                : "Очередь пуста — перетащи файлы в зону слева или выбери их на диске."}
             </div>
-          </div>
-        )}
+          ) : (
+            <>
+              <div className={s.queueHeader}>
+                <span className={s.queueCount}>Очередь ({activeQueue.length})</span>
+              </div>
+              <div className={s.queue}>
+                {activeQueue.map((item) => (
+                  <div key={item.id} className={s.row}>
+                    <div
+                      className={`${s.head} ${item.expanded ? s.headExpanded : ""}`}
+                      onClick={() => item.status === "ready" && toggleExpanded(item.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          if (item.status === "ready") toggleExpanded(item.id);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={item.status === "ready" ? 0 : -1}
+                    >
+                      {item.inspect?.coverPreview ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={item.inspect.coverPreview} alt="" className={s.thumb} />
+                      ) : (
+                        <div className={s.thumb} />
+                      )}
+                      <div className={s.meta}>
+                        <div className={s.title}>{item.edit.title || item.audio.name}</div>
+                        <div className={s.sub}>
+                          {item.edit.artistName || "—"} · {item.audio.name}
+                          {item.inspect && ` · ${fmtDuration(item.inspect.durationSec)}`}
+                        </div>
+                        {item.error && <div className={s.error}>{item.error}</div>}
+                      </div>
+                      <div className={s.side}>
+                        {item.lrc ? (
+                          <span className={`${s.badge} ${s.badgeLrc}`}>LRC</span>
+                        ) : null}
+                        <div style={{ marginTop: 4 }}>{statusBadge(item)}</div>
+                      </div>
+                    </div>
 
-        <p style={{ fontSize: 12, color: "#6a6a6a", marginBottom: 12 }}>
-          В имени файла «Артист1 & Артист2 — Трек» оба артиста подставятся автоматически.
-        </p>
+                    {item.expanded && item.status === "ready" && (
+                      <div className={s.body} onClick={(e) => e.stopPropagation()}>
+                        <div className={s.bodyField}>
+                          <span className={s.fieldLabel}>Артисты</span>
+                          <ArtistNameInput
+                            value={item.edit.artistName}
+                            onChange={(v) => patchEdit(item.id, { artistName: v })}
+                            placeholder="5opka, илюха реп"
+                            inputClassName={s.bodyArtistInput}
+                          />
+                        </div>
+                        <div className={s.bodyField}>
+                          <span className={s.fieldLabel}>Название</span>
+                          <input
+                            className={s.input}
+                            value={item.edit.title}
+                            onChange={(e) => patchEdit(item.id, { title: e.target.value })}
+                          />
+                        </div>
+                        <div className={s.bodyField}>
+                          <span className={s.fieldLabel}>Альбом</span>
+                          <input
+                            className={s.input}
+                            value={item.edit.album}
+                            onChange={(e) => patchEdit(item.id, { album: e.target.value })}
+                          />
+                        </div>
+                        <div className={s.grid2}>
+                          <div className={s.bodyField}>
+                            <span className={s.fieldLabel}>Год</span>
+                            <input
+                              className={s.input}
+                              value={item.edit.year}
+                              onChange={(e) => patchEdit(item.id, { year: e.target.value })}
+                            />
+                          </div>
+                          <div className={s.bodyField}>
+                            <span className={s.fieldLabel}>№ трека</span>
+                            <input
+                              className={s.input}
+                              value={item.edit.trackNumber}
+                              onChange={(e) => patchEdit(item.id, { trackNumber: e.target.value })}
+                            />
+                          </div>
+                        </div>
+                        <div className={s.bodyField}>
+                          <span className={s.fieldLabel}>Жанр</span>
+                          <input
+                            className={s.input}
+                            value={item.edit.genre}
+                            onChange={(e) => patchEdit(item.id, { genre: e.target.value })}
+                          />
+                        </div>
+                        <div className={s.bodyField}>
+                          <span className={s.fieldLabel}>Описание</span>
+                          <textarea
+                            className={s.textarea}
+                            value={item.edit.description}
+                            onChange={(e) => patchEdit(item.id, { description: e.target.value })}
+                            rows={2}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
 
-        {err && <p className={auth.error}>{err}</p>}
-        {summary && (
-          <p className={auth.subtitle} style={{ color: summary.startsWith("Загружено") ? "#96FF55" : undefined }}>
-            {summary}
-          </p>
-        )}
+        <div className={s.footer}>
+          {err && <p className={s.statusErr}>{err}</p>}
+          {summary && (
+            <p className={s.statusOk}>
+              {summary}
+              {targetRelease && summary.startsWith("Загружено") && (
+                <>
+                  {" "}
+                  <Link href={canonicalReleaseUrl(targetRelease.slug)} className={s.link}>
+                    Открыть релиз
+                  </Link>
+                </>
+              )}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

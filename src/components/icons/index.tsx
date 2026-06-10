@@ -20,6 +20,8 @@ import heartFillSvg from "@/assets/fpI/Favorite_fill.svg?raw";
 import heartOutlineSvg from "@/assets/fpI/Favorite_light.svg?raw";
 import playlistSvg from "@/assets/fpI/Status_list.svg?raw";
 import moreSvg from "@/assets/fpI/Meatballs_menu.svg?raw";
+import textSvg from "@/assets/fpI/Text.svg?raw";
+import fullscreenSvg from "@/assets/fpI/Full_light.svg?raw";
 import { AssetIcon, type IconTone } from "@/components/Icon/AssetIcon";
 import { HiuniMascot } from "@/components/Brand/HiuniMascot";
 
@@ -164,4 +166,27 @@ export function PlaylistIcon(props: IconProps) {
 
 export function MoreIcon(props: IconProps) {
   return <Icon src={moreSvg} {...props} />;
+}
+
+export function LyricsIcon(props: IconProps) {
+  return <Icon src={textSvg} {...props} />;
+}
+
+export function FullscreenIcon(props: IconProps) {
+  return <Icon src={fullscreenSvg} {...props} />;
+}
+
+export function DislikeIcon(props: IconProps) {
+  const { size = 16, className, tone = "muted" } = props;
+  const color = tone === "primary" ? "#ffffff" : "#a0a0a0";
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" className={className} aria-hidden>
+      <path
+        d="M8 12.8S4.8 10.4 4.8 7.2 6.2 4.8 8 4.8c.9 0 1.6.5 2 1.1.4-.6 1.1-1.1 2-1.1 1.8 0 3.2 1.3 3.2 3.4S11.2 12.8 8 12.8Z"
+        stroke={color}
+        strokeWidth="1.1"
+      />
+      <path d="M3.2 3.2 12.8 12.8" stroke={color} strokeWidth="1.1" strokeLinecap="round" />
+    </svg>
+  );
 }

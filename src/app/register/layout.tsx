@@ -1,5 +1,6 @@
 import { Suspense } from "react";
+import { AuthGateSkeleton } from "@/components/Skeleton";
 
 export default function RegisterLayout({ children }: { children: React.ReactNode }) {
-  return <Suspense fallback={<p className="muted">Загрузка…</p>}>{children}</Suspense>;
+  return <Suspense fallback={<AuthGateSkeleton />}>{children}</Suspense>;
 }

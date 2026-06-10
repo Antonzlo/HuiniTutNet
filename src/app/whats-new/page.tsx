@@ -12,11 +12,13 @@ import {
 import { useWhatsNew } from "@/context/WhatsNewContext";
 import { usePlayer } from "@/context/PlayerContext";
 import { PlayIdsButton } from "@/components/PlayIdsButton";
+import { WhatsNewSkeleton } from "@/components/Skeleton";
 import s from "./whats-new.module.scss";
 
 type FeedItem = {
   id: string;
   type: "single" | "album";
+  typeLabel?: string;
   title: string;
   artistName: string;
   artistSlug: string;
@@ -56,7 +58,7 @@ export default function WhatsNewPage() {
   }
 
   function renderRow(item: FeedItem) {
-    const typeLabel = item.type === "single" ? "Сингл" : "Альбом";
+    const typeLabel = item.typeLabel ?? (item.type === "single" ? "Сингл" : "Альбом");
     return (
       <div key={item.id} className={`${s.row} ${item.isUnread ? s.rowUnread : ""}`}>
         <Link href={item.href} className={s.coverLink}>
@@ -88,6 +90,8 @@ export default function WhatsNewPage() {
     );
   }
 
+  if (loading) return <WhatsNewSkeleton />;
+
   return (
     <div className={s.page}>
       <div className={s.hero}>
@@ -97,9 +101,7 @@ export default function WhatsNewPage() {
         </p>
       </div>
 
-      {loading ? (
-        <p className={s.empty}>Загрузка…</p>
-      ) : items.length === 0 ? (
+      {items.length === 0 ? (
         <div className={s.empty}>
           <p>Пока ничего нового</p>
           <p className={s.emptyHint}>Когда появятся новые релизы, они будут здесь</p>

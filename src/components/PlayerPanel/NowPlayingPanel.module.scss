@@ -1,0 +1,385 @@
+@use 'styles/variables' as *;
+@use 'styles/scroll' as *;
+
+$organic: cubic-bezier(0.22, 1, 0.36, 1);
+$shift-dur: 0.72s;
+$lyrics-in-dur: 0.58s;
+$lyrics-out-dur: 0.3s;
+$lyrics-in-delay: 0.22s;
+
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.bgBlur,
+.bgGradient,
+.bgVignette {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s $organic;
+}
+
+.bgBlur {
+  inset: -24%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(72px) brightness(0.28) saturate(1.5);
+  transform: scale(1.15);
+}
+
+.bgGradient {
+  transition:
+    opacity 0.55s $organic,
+    background 0.8s ease;
+}
+
+.bgVignette {
+  background: radial-gradient(
+    ellipse 75% 65% at 50% 38%,
+    transparent 0%,
+    rgba(0, 0, 0, 0.45) 55%,
+    rgba(0, 0, 0, 0.82) 100%
+  );
+  transition: background 0.72s $organic;
+}
+
+.rootLyrics .bgVignette {
+  background: radial-gradient(
+    ellipse 58% 72% at 48% 40%,
+    transparent 0%,
+    rgba(0, 0, 0, 0.48) 52%,
+    rgba(0, 0, 0, 0.88) 100%
+  );
+}
+
+.bgVisible {
+  opacity: 1;
+}
+
+.head {
+  position: relative;
+  z-index: 3;
+  flex-shrink: 0;
+}
+
+.stack {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-height: 0;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  transition:
+    opacity 0.36s $organic,
+    transform 0.48s $organic;
+}
+
+.layerIn {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.layerOut {
+  opacity: 0;
+  transform: translateY(8px) scale(0.99);
+  pointer-events: none;
+}
+
+.compactHero {
+  margin-bottom: 16px;
+}
+
+.compactCoverWrap {
+  margin-bottom: 14px;
+}
+
+.compactCover {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: $radius-md;
+  object-fit: cover;
+  box-shadow: $shadow-sm;
+}
+
+.compactCoverPlaceholder {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: $radius-md;
+  background: $bg-tertiary;
+}
+
+.compactMeta {
+  min-width: 0;
+}
+
+.compactTitle {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: $text-primary;
+  line-height: 1.2;
+  margin: 0 0 6px;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.compactArtists {
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.expandedMain {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.expandedCanvas {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.heroCluster {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: max-content;
+  max-width: min(420px, 88vw);
+  transform: translate(-50%, -50%);
+  transition:
+    left $shift-dur $organic,
+    transform $shift-dur $organic;
+  will-change: left, transform;
+}
+
+.heroClusterLeft {
+  left: 50%;
+  align-items: flex-end;
+  transform: translate(calc(-100% - 40px), -50%);
+}
+
+.expandedCover {
+  width: min(360px, 38vh, 36vw);
+  height: min(360px, 38vh, 36vw);
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow:
+    0 32px 64px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+  transition:
+    width $shift-dur $organic,
+    height $shift-dur $organic,
+    box-shadow 0.5s ease;
+}
+
+.heroClusterLeft .expandedCover {
+  width: min(360px, 42vh, 34vw);
+  height: min(360px, 42vh, 34vw);
+  box-shadow:
+    0 28px 56px rgba(0, 0, 0, 0.52),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.expandedCoverPlaceholder {
+  width: min(360px, 38vh, 36vw);
+  height: min(360px, 38vh, 36vw);
+  border-radius: 8px;
+  background: $bg-tertiary;
+  transition:
+    width $shift-dur $organic,
+    height $shift-dur $organic;
+}
+
+.heroClusterLeft .expandedCoverPlaceholder {
+  width: min(360px, 42vh, 34vw);
+  height: min(360px, 42vh, 34vw);
+}
+
+.expandedMeta {
+  text-align: center;
+  width: 100%;
+  transition: text-align $shift-dur $organic;
+}
+
+.heroClusterLeft .expandedMeta {
+  text-align: right;
+}
+
+.expandedTitle {
+  display: block;
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: $text-primary;
+  line-height: 1.1;
+  margin: 0 0 10px;
+  text-decoration: none;
+  transition: font-size $shift-dur $organic;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.heroClusterLeft .expandedTitle {
+  font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+}
+
+.expandedArtists {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $text-secondary;
+  transition: font-size $shift-dur $organic;
+}
+
+.heroClusterLeft .expandedArtists {
+  font-size: 14px;
+}
+
+.lyricsRail {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  bottom: 0;
+  z-index: 1;
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.lyricsRailDocked {
+  left: 50%;
+  width: 50%;
+  opacity: 1;
+  padding: 0 16px 0 32px;
+  overflow: hidden;
+}
+
+.lyricsRailDocked:not(.lyricsRailOpen) {
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s $lyrics-out-dur;
+}
+
+.lyricsRailOpen {
+  visibility: visible;
+  pointer-events: auto;
+  transition: visibility 0s 0s;
+}
+
+.lyricsRailInner {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translate3d(36px, 8px, 0) scale(0.985);
+  filter: blur(12px);
+  transition:
+    opacity $lyrics-out-dur $organic,
+    transform $lyrics-out-dur $organic,
+    filter $lyrics-out-dur ease;
+}
+
+.lyricsRailOpen .lyricsRailInner {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  filter: blur(0);
+  transition-duration: $lyrics-in-dur;
+  transition-delay: $lyrics-in-delay;
+}
+
+.expandedDock {
+  flex-shrink: 0;
+  padding: 0 40px 32px;
+  position: relative;
+  z-index: 3;
+}
+
+.expandedCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.closeX {
+  font-size: 22px;
+  line-height: 1;
+  color: $text-secondary;
+}
+
+@media (max-width: 900px) {
+  .expandedCards {
+    grid-template-columns: 1fr;
+  }
+
+  .heroClusterLeft {
+    transform: translate(calc(-100% - 20px), -50%);
+  }
+
+  .heroClusterLeft .expandedCover,
+  .heroClusterLeft .expandedCoverPlaceholder {
+    width: min(300px, 36vh, 72vw);
+    height: min(300px, 36vh, 72vw);
+  }
+
+  .lyricsRailDocked {
+    padding: 0 16px 0 16px;
+  }
+
+  .expandedDock {
+    padding: 0 20px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroCluster,
+  .expandedCover,
+  .expandedCoverPlaceholder,
+  .expandedTitle,
+  .lyricsRail,
+  .lyricsRailInner {
+    transition-duration: 0.01ms;
+    transition-delay: 0s;
+  }
+
+  .lyricsRailInner {
+    filter: none;
+    transform: none;
+  }
+}

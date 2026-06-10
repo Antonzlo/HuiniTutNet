@@ -11,7 +11,7 @@ console.log(`[radmin] Login:    ${webUrl}/login`);
 console.log("[radmin] Запусти backend: npm run dev:radmin");
 console.log("[radmin] ─────────────────────────────");
 
-const child = spawn("npx next dev -H 0.0.0.0 -p 3000", {
+const child = spawn("npx next dev -H 0.0.0.0 -p 4632", {
   shell: true,
   stdio: "inherit",
   env: { ...process.env, NEXT_PUBLIC_API_URL: apiUrl },

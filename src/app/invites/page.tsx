@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { ListPageSkeleton } from "@/components/Skeleton";
 import page from "@/styles/page.module.scss";
 
 type Invite = {
@@ -19,9 +20,14 @@ export default function InvitesPage() {
   const [maxUses, setMaxUses] = useState(1);
   const [hours, setHours] = useState(48);
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(true);
 
   function load() {
-    api<Invite[]>("/api/invites").then(setLinks).catch((e) => setErr(e.message));
+    setLoading(true);
+    api<Invite[]>("/api/invites")
+      .then(setLinks)
+      .catch((e) => setErr(e.message))
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -42,6 +48,8 @@ export default function InvitesPage() {
     await api(`/api/invites/${id}`, { method: "DELETE" });
     load();
   }
+
+  if (loading && links.length === 0) return <ListPageSkeleton rows={4} />;
 
   return (
     <div className={page.view}>

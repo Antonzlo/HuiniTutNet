@@ -33,6 +33,13 @@ export type Track = {
   filePath: string;
   fileName?: string;
   fileSize: number;
+  bitrate?: number | null;
+  sampleRate?: number | null;
+  bitsPerSample?: number | null;
+  releaseId?: string | null;
+  singleReleaseId?: string | null;
+  singleRelease?: { id: string; title: string; slug: string; year?: number | null; type: string } | null;
+  release?: { id: string; title: string; slug: string; type?: string } | null;
   durationSec?: number | null;
   playCount?: number;
   coverUrl?: string | null;
@@ -49,6 +56,8 @@ export type Track = {
   _count?: { favorites: number; ratings: number };
 };
 
+export type ReleaseType = "SINGLE" | "EP" | "ALBUM" | "COMPILATION";
+
 export type InspectedAudio = {
   title?: string;
   artist?: string;
@@ -58,10 +67,15 @@ export type InspectedAudio = {
   genre?: string;
   trackNumber?: number;
   durationSec?: number;
+  bitrate?: number;
+  sampleRate?: number;
+  bitsPerSample?: number;
   coverPreview?: string;
   fileSize: number;
   format: string;
   fileName: string;
+  hasTagTitle?: boolean;
+  hasTagArtist?: boolean;
   suggestedTitle: string;
   suggestedArtist?: string;
   suggestedArtists?: string[];

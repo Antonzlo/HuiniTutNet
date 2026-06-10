@@ -9,25 +9,18 @@
 }
 
 .lg .controls {
-  gap: 24px;
+  gap: 28px;
 }
 
 .lg .playBtn {
   width: 56px;
   height: 56px;
-  background: $accent;
-  color: $accent-text;
-  box-shadow: 0 4px 24px $accent-glow;
-
-  &:hover:not(:disabled) {
-    background: $accent-hover;
-    box-shadow: 0 6px 32px $accent-glow;
-  }
 }
 
 .controls {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 16px;
 }
 
@@ -35,16 +28,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 32px;
+  height: 32px;
   color: $text-secondary;
   transition: color $transition-fast, transform $transition-fast;
 
   &:hover:not(:disabled) {
     color: $text-primary;
-    transform: scale(1.08);
+    transform: scale(1.06);
   }
 
   &:disabled {
-    opacity: 0.35;
+    opacity: 0.4;
   }
 }
 
@@ -52,24 +47,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   background: $text-primary;
   border-radius: 50%;
-  color: $bg-primary;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: $bg-base;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
 
   &:hover:not(:disabled) {
-    transform: scale(1.08);
-  }
-
-  &.playing {
-    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.12);
+    transform: scale(1.06);
   }
 
   &:disabled {
     opacity: 0.5;
   }
+}
+
+.lg .playBtn {
+  width: 56px;
+  height: 56px;
 }
 
 .timeline {
@@ -83,7 +80,8 @@
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   color: $text-muted;
-  min-width: 40px;
+  min-width: 36px;
+  flex-shrink: 0;
 
   &:last-child {
     text-align: right;
@@ -99,17 +97,23 @@
   position: relative;
   height: 4px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.3);
   cursor: pointer;
 
-  &:hover .progressFill {
-    background: $accent;
+  &:hover {
+    .progressFill {
+      background: $accent;
+    }
+
+    .progressThumb {
+      opacity: 1;
+      background: $accent;
+    }
   }
 }
 
 .lg .progressWrap {
   height: 6px;
-  border-radius: 3px;
 }
 
 .progressFill {
@@ -120,6 +124,24 @@
   background: $text-primary;
   pointer-events: none;
   transition: width 0.1s linear, background $transition-fast;
+}
+
+.progressThumb {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: $text-primary;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, background $transition-fast;
+}
+
+.progressWrap:hover .progressThumb {
+  opacity: 1;
 }
 
 .progressInput {

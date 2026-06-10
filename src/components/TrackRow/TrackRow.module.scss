@@ -32,20 +32,41 @@
 .tableRow {
   grid-template-columns: 48px minmax(180px, 3fr) minmax(120px, 2fr) minmax(100px, 1.5fr) 72px 72px 64px;
   gap: 16px;
+
+  .indexCell { grid-column: 1; }
+  .titleCell { grid-column: 2; }
+  .artistCell { grid-column: 3; }
+  .albumCell { grid-column: 4; }
+  .formatCell { grid-column: 5; }
+  .ratingCell { grid-column: 6; }
+  .actionsCell { grid-column: 7; }
 }
 
 .playlistRow {
-  grid-template-columns: 40px minmax(200px, 4fr) minmax(120px, 2fr) minmax(100px, 1.2fr) 72px;
+  grid-template-columns: 40px minmax(200px, 4fr) minmax(90px, 1fr) minmax(120px, 2fr) minmax(100px, 1.2fr) 72px;
   gap: 12px;
   padding: 6px 16px;
   border-radius: 0;
+
+  .indexCell { grid-column: 1; }
+  .titleCell { grid-column: 2; }
+  .formatCell { grid-column: 3; }
+  .albumCol { grid-column: 4; }
+  .dateCol { grid-column: 5; }
+  .endCol { grid-column: 6; }
 }
 
 .artistRow {
-  grid-template-columns: 40px minmax(200px, 4fr) minmax(80px, 1fr) 72px;
+  grid-template-columns: 40px minmax(200px, 4fr) minmax(90px, 1fr) minmax(80px, 1fr) 72px;
   gap: 12px;
   padding: 6px 16px;
   border-radius: 0;
+
+  .indexCell { grid-column: 1; }
+  .titleCell { grid-column: 2; }
+  .formatCell { grid-column: 3; }
+  .playsCol { grid-column: 4; }
+  .endCol { grid-column: 5; }
 }
 
 .indexCell {
@@ -156,8 +177,31 @@
 .formatCell {
   font-size: 13px;
   color: $text-muted;
-  text-align: right;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playlistRow .formatCell,
+.artistRow .formatCell {
+  text-align: left;
+}
+
+.tableRow .formatCell {
+  text-align: right;
+}
+
+.singleLink {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: $accent;
+  margin-top: 2px;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .ratingCell {
@@ -337,22 +381,45 @@
 @media (max-width: 900px) {
   .playlistRow {
     grid-template-columns: 36px minmax(0, 1fr) 72px;
+
+    .formatCell,
+    .albumCol,
+    .dateCol {
+      display: none;
+    }
+
+    .endCol {
+      grid-column: 3;
+    }
   }
 
-  .albumCol,
-  .dateCol {
-    display: none;
+  .artistRow {
+    grid-template-columns: 36px minmax(0, 1fr) 72px;
+
+    .formatCell,
+    .playsCol {
+      display: none;
+    }
+
+    .endCol {
+      grid-column: 3;
+    }
   }
 }
 
 @media (max-width: 768px) {
   .tableRow {
     grid-template-columns: 40px minmax(0, 1fr) 48px;
-  }
 
-  .artistCell,
-  .formatCell,
-  .ratingCell {
-    display: none;
+    .artistCell,
+    .formatCell,
+    .ratingCell,
+    .albumCell {
+      display: none;
+    }
+
+    .actionsCell {
+      grid-column: 3;
+    }
   }
 }

@@ -1,0 +1,57 @@
+@use 'styles/variables' as *;
+
+$btn-size: 40px;
+
+.playOverlay {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 5;
+  width: $btn-size;
+  height: $btn-size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: $accent;
+  color: $accent-text;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity $transition-fast,
+    transform $transition-fast,
+    background $transition-fast;
+  pointer-events: none;
+  cursor: pointer;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  &:hover {
+    filter: brightness(1.05);
+  }
+
+  &.round {
+    right: 6px;
+    bottom: 6px;
+  }
+}
+
+.coverWrap {
+  position: relative;
+}
+
+.coverWrapRound {
+  overflow: visible;
+}
+
+.shelfCard:hover .playOverlay:not(.visible) {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}

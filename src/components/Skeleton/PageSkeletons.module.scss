@@ -1,0 +1,325 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.collectionPage {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.collectionHero {
+  display: flex;
+  align-items: flex-end;
+  gap: 28px;
+  padding: 28px 28px 32px;
+  @include brand-hero-gradient;
+}
+
+.collectionHeroArtist {
+  min-height: 340px;
+  padding: 24px 24px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.collectionCover {
+  width: 232px;
+  height: 232px;
+  flex-shrink: 0;
+}
+
+.collectionCoverSquare {
+  border-radius: $radius-md;
+}
+
+.collectionMeta {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.collectionToolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px 12px;
+}
+
+.artistMain {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 32px;
+  padding: 0 24px 32px;
+}
+
+.artistSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebarCard {
+  height: 120px;
+  border-radius: $radius-md;
+}
+
+.shelfSection {
+  padding: 8px 24px 32px;
+}
+
+.shelfTitle {
+  margin-bottom: 16px;
+}
+
+.shelfRow {
+  display: flex;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.shelfCard {
+  width: 168px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shelfCover {
+  width: 168px;
+  height: 168px;
+  border-radius: $radius-md;
+}
+
+.home {
+  padding: 24px 28px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.homeGreeting {
+  height: 40px;
+  width: min(280px, 60%);
+  border-radius: $radius-md;
+}
+
+.homeQuick {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (min-width: 900px) {
+  .homeQuick {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.homeQuickCard {
+  height: 56px;
+  border-radius: $radius-sm;
+}
+
+.homeShelfHead {
+  height: 28px;
+  width: 200px;
+  margin-bottom: 16px;
+  border-radius: $radius-sm;
+}
+
+.homeShelfItems {
+  display: flex;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.homeShelfItem {
+  width: 168px;
+  flex-shrink: 0;
+}
+
+.trackList {
+  padding: 0 16px 24px;
+}
+
+.trackHead {
+  height: 36px;
+  margin-bottom: 4px;
+  border-radius: $radius-sm;
+}
+
+.trackRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.trackIndex {
+  width: 24px;
+  height: 14px;
+}
+
+.trackCover {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-sm;
+}
+
+.trackBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.trackTitle {
+  height: 16px;
+  max-width: 240px;
+}
+
+.trackSub {
+  height: 12px;
+  max-width: 160px;
+}
+
+.trackTail {
+  width: 48px;
+  height: 14px;
+}
+
+.libraryList {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.libraryRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 4px;
+}
+
+.libraryCover {
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-sm;
+}
+
+.libraryText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.whatsNew {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 8px 24px 48px;
+}
+
+.whatsNewHero {
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.whatsNewTitle {
+  height: 44px;
+  width: min(260px, 70%);
+  border-radius: $radius-md;
+}
+
+.whatsNewDesc {
+  height: 16px;
+  width: min(420px, 90%);
+}
+
+.whatsNewSection {
+  margin-bottom: 28px;
+}
+
+.whatsNewSectionTitle {
+  height: 14px;
+  width: 120px;
+  margin-bottom: 12px;
+}
+
+.formPage {
+  padding: 24px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.formHero {
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.formCard {
+  height: 320px;
+  border-radius: $radius-lg;
+}
+
+.authGate {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px;
+}
+
+.authBlocks {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: min(240px, 80%);
+}
+
+.listPage {
+  padding: 24px;
+}
+
+.listHero {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.listRows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.listRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+}
+
+.listAvatar {
+  width: 48px;
+  height: 48px;
+}
+
+.redirect {
+  padding: 24px;
+  max-width: 400px;
+}

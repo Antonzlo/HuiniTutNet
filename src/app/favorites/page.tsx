@@ -7,6 +7,7 @@ import { fmtTotalDuration, totalDurationSec } from "@/lib/track";
 import { HiuniTrackList } from "@/components/TrackList/HiuniTrackList";
 import { PlayCollectionButton } from "@/components/PlayCollectionButton";
 import { useAuth } from "@/context/AuthContext";
+import { CollectionPageSkeleton } from "@/components/Skeleton";
 import home from "../home.module.scss";
 
 const FAVORITES_CONTEXT = "playlist:favorites";
@@ -25,6 +26,8 @@ export default function FavoritesPage() {
 
   const totalSec = totalDurationSec(tracks);
   const initial = user?.displayName?.[0]?.toUpperCase() ?? "♥";
+
+  if (loading && tracks.length === 0) return <CollectionPageSkeleton variant="square" trackRows={10} />;
 
   return (
     <div className={home.page}>
@@ -63,7 +66,6 @@ export default function FavoritesPage() {
       {err && <div className={home.error}>{err}</div>}
       <HiuniTrackList
         tracks={tracks}
-        loading={loading}
         variant="playlist"
         playContextId={FAVORITES_CONTEXT}
         emptyMessage="Избранное пусто"

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { api, getToken, mediaUrl } from "@/lib/api";
 import page from "@/styles/page.module.scss";
+import { FormPageSkeleton } from "@/components/Skeleton";
 import auth from "@/components/LoginScreen/LoginScreen.module.scss";
 
 const MAX_MB = 100;
@@ -108,6 +109,8 @@ export default function AdsPage() {
       setProgress("");
     }
   }
+
+  if (mine === undefined) return <FormPageSkeleton />;
 
   return (
     <div className={page.view}>
