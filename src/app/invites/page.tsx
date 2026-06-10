@@ -60,8 +60,10 @@ export default function InvitesPage() {
 
       <form onSubmit={create} className={page.panel}>
         <h3 className={page.panelTitle}>Новый инвайт</h3>
-        <input type="number" min={1} max={50} value={maxUses} onChange={(e) => setMaxUses(Number(e.target.value))} className={page.input} placeholder="Макс. использований" />
-        <input type="number" min={1} max={720} value={hours} onChange={(e) => setHours(Number(e.target.value))} className={page.input} placeholder="Часов до истечения" />
+        <label htmlFor="maxUses">Макс. использований</label>
+        <input id="maxUses" type="number" min={1} max={50} value={maxUses} onChange={(e) => setMaxUses(Number(e.target.value))} className={page.input} placeholder="Макс. использований" />
+        <label htmlFor="hours">Часов до истечения</label>
+        <input id="hours" type="number" min={1} max={720} value={hours} onChange={(e) => setHours(Number(e.target.value))} className={page.input} placeholder="Часов до истечения" />
         {err && <div className={page.error}>{err}</div>}
         <button type="submit" className={page.btn}>
           Создать
