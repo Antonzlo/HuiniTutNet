@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { api, getApiBase, getToken } from "@/lib/api";
 import { inspectAudio } from "@/lib/inspect-audio";
+import { SpectrogramViewer } from "@/components/SpectrogramViewer/SpectrogramViewer";
 import type { DbRelease } from "@/lib/release";
 import { canonicalReleaseUrl, releaseTypeLabel } from "@/lib/release";
 import { ArtistNameInput } from "@/components/ArtistNameInput/ArtistNameInput";
@@ -172,6 +173,7 @@ export default function UploadPage() {
   const [dragOver, setDragOver] = useState(false);
   const [err, setErr] = useState("");
   const [summary, setSummary] = useState("");
+  const [spectrogramFile, setSpectrogramFile] = useState<File | null>(null);
   const [publish, setPublish] = useState<BatchPublish>({
     releaseType: "ALBUM",
     releaseTitle: "",
@@ -409,6 +411,7 @@ export default function UploadPage() {
   const activeQueue = queue.filter((q) => q.status !== "done");
 
   return (
+    <>
     <div className={page.view}>
       <div className={page.hero}>
         <h1 className={page.heroTitle}>
@@ -609,6 +612,16 @@ export default function UploadPage() {
                         {item.lrc ? (
                           <span className={`${s.badge} ${s.badgeLrc}`}>LRC</span>
                         ) : null}
+                        {item.status === "ready" && (
+                          <button
+                            type="button"
+                            className={s.spectroBtn}
+                            onClick={(e) => { e.stopPropagation(); setSpectrogramFile(item.audio); }}
+                            title="Открыть спектрограмму"
+                          >
+                            спектр
+                          </button>
+                        )}
                         <div style={{ marginTop: 4 }}>{statusBadge(item)}</div>
                       </div>
                     </div>
@@ -702,5 +715,13 @@ export default function UploadPage() {
         </div>
       </div>
     </div>
+
+    {spectrogramFile && (
+      <SpectrogramViewer
+        file={spectrogramFile}
+        onClose={() => setSpectrogramFile(null)}
+      />
+    )}
+    </>
   );
 }

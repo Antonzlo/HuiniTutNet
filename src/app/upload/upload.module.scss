@@ -358,3 +358,23 @@
     grid-template-columns: 1fr;
   }
 }
+
+.spectroBtn {
+  display: inline-block;
+  padding: 2px 8px;
+  margin-bottom: 4px;
+  border-radius: $radius-pill;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: $text-muted;
+  transition: border-color $transition-fast, color $transition-fast;
+
+  &:hover {
+    border-color: rgba($accent, 0.5);
+    color: $accent;
+  }
+}
