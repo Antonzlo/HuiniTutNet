@@ -80,7 +80,7 @@ export function PlayerBar() {
           <div className={styles.cover} key={currentTrack?.id}>
             {currentTrack?.coverUrl && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={mediaUrl(currentTrack.coverUrl)} alt="" />
+              <img src={mediaUrl(currentTrack.coverUrl, { w: 128 })} alt="" decoding="async" />
             )}
           </div>
         </button>

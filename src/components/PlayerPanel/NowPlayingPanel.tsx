@@ -30,7 +30,7 @@ export function NowPlayingPanel() {
   if (!currentTrack) return null;
 
   const contextLabel = queueContextLabel(queueContextId, currentTrack);
-  const coverSrc = currentTrack.coverUrl ? mediaUrl(currentTrack.coverUrl) : null;
+  const coverSrc = currentTrack.coverUrl ? mediaUrl(currentTrack.coverUrl, { w: 512 }) : null;
   const { heroStyle } = useCoverGradient(coverSrc);
   const lyricsOpen = panelFullscreen && immersive === "lyrics" && !isAd;
 

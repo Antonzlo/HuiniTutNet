@@ -59,7 +59,7 @@ export default function CanonicalReleasePage() {
   }, [slugKey]);
 
   const tracks = useMemo(() => release?.tracks ?? [], [release]);
-  const coverSrc = release?.coverUrl ? mediaUrl(release.coverUrl) : null;
+  const coverSrc = release?.coverUrl ? mediaUrl(release.coverUrl, { w: 512 }) : null;
   const { heroStyle } = useCoverGradient(coverSrc);
   const totalSec = totalDurationSec(tracks);
   const saved = slug ? isSavedBySlug(slug) : false;

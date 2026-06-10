@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { api, getToken, mediaUrl } from "@/lib/api";
+import { api, audioUrl, getApiBase, getToken, mediaUrl } from "@/lib/api";
 import page from "@/styles/page.module.scss";
 import { FormPageSkeleton } from "@/components/Skeleton";
 import auth from "@/components/LoginScreen/LoginScreen.module.scss";
@@ -76,7 +76,7 @@ export default function AdsPage() {
     const timer = setTimeout(() => ctrl.abort(), 600_000);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ads/upload`, {
+      const res = await fetch(`${getApiBase()}/api/ads/upload`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -125,14 +125,14 @@ export default function AdsPage() {
         <div className={page.banner} style={{ margin: "0 20px 16px" }}>
           <strong>Твоя реклама на эту неделю:</strong> {mine.title}
           {(mine.mimeType.startsWith("audio/") || mine.filePath.endsWith(".wav")) && (
-            <audio controls style={{ width: "100%", marginTop: 12 }} src={mediaUrl(mine.filePath)} />
+            <audio controls style={{ width: "100%", marginTop: 12 }} src={audioUrl(mine.filePath)} />
           )}
           {mine.mimeType.startsWith("image/") && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={mediaUrl(mine.filePath)} alt={mine.title} style={{ maxWidth: "100%", marginTop: 12, borderRadius: 8 }} />
+            <img src={mediaUrl(mine.filePath, { original: true })} alt={mine.title} style={{ maxWidth: "100%", marginTop: 12, borderRadius: 8 }} />
           )}
           {mine.mimeType.startsWith("video/") && (
-            <video controls style={{ width: "100%", marginTop: 12 }} src={mediaUrl(mine.filePath)} />
+            <video controls style={{ width: "100%", marginTop: 12 }} src={audioUrl(mine.filePath)} />
           )}
         </div>
       )}

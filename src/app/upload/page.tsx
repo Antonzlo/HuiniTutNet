@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { api, getToken } from "@/lib/api";
+import { api, getApiBase, getToken } from "@/lib/api";
 import type { DbRelease } from "@/lib/release";
 import { canonicalReleaseUrl, releaseTypeLabel } from "@/lib/release";
 import { ArtistNameInput } from "@/components/ArtistNameInput/ArtistNameInput";
@@ -197,7 +197,7 @@ export default function UploadPage() {
     fd.append("file", item.audio);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tracks/inspect`, {
+      const res = await fetch(`${getApiBase()}/api/tracks/inspect`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -346,7 +346,7 @@ export default function UploadPage() {
     const timer = setTimeout(() => ctrl.abort(), 600_000);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tracks/upload`, {
+      const res = await fetch(`${getApiBase()}/api/tracks/upload`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

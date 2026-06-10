@@ -179,7 +179,7 @@ export function HiuniTrackRow({
           <div className={styles.artThumb}>
             {track.coverUrl && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={mediaUrl(track.coverUrl)} alt="" className={styles.artImg} />
+              <img src={mediaUrl(track.coverUrl, { w: 128 })} alt="" className={styles.artImg} loading="lazy" decoding="async" />
             )}
           </div>
           <div className={styles.titleMeta}>

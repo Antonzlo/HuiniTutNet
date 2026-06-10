@@ -136,7 +136,7 @@ export default function ArtistPage() {
     return fromPopular ?? fromRelease ?? fromAny ?? artist?.imageUrl ?? artist?.avatarUrl ?? null;
   }, [popular, tracks, allReleases, artist?.imageUrl, artist?.avatarUrl]);
 
-  const coverSrc = heroCoverUrl ? mediaUrl(heroCoverUrl) : null;
+  const coverSrc = heroCoverUrl ? mediaUrl(heroCoverUrl, { w: 512 }) : null;
   const { heroStyle } = useCoverGradient(coverSrc);
   const totalSec = totalDurationSec(tracks);
   const initial = artist?.name?.[0]?.toUpperCase() ?? "?";

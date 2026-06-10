@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { api, getToken, mediaUrl } from "@/lib/api";
+import { api, getApiBase, getToken, mediaUrl } from "@/lib/api";
 import { ArtistNameInput } from "@/components/ArtistNameInput/ArtistNameInput";
 import type { Track } from "@/lib/types";
 import { trackArtistNames } from "@/lib/track";
@@ -130,7 +130,7 @@ export default function EditTrackPage() {
     setErr("");
     const fd = new FormData();
     fd.append("file", f);
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tracks/${id}/cover`, {
+    const res = await fetch(`${getApiBase()}/api/tracks/${id}/cover`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: fd,

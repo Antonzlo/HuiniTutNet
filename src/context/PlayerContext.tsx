@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { api, mediaUrl } from "@/lib/api";
+import { api, audioUrl } from "@/lib/api";
 import { fetchAutoplayTracks } from "@/lib/autoplay";
 import {
   ADS_ENABLED,
@@ -89,7 +89,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const loadSrc = useCallback((track: Track) => {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.src = mediaUrl(track.filePath);
+    audio.preload = "metadata";
+    audio.src = audioUrl(track.filePath);
+    audio.load();
     lastTickRef.current = null;
     resetPlayListen();
   }, [resetPlayListen]);
@@ -291,6 +293,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const audio = new Audio();
+    audio.preload = "metadata";
     audioRef.current = audio;
 
     const onTime = () => {

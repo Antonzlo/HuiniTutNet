@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { api, getToken, mediaUrl } from "@/lib/api";
+import { api, getApiBase, getToken, mediaUrl } from "@/lib/api";
 import type { DbRelease, ReleaseType } from "@/lib/release";
 import { decodeSlugParam, releaseApiPath, releaseTypeLabel } from "@/lib/release";
 import { trackArtistNames } from "@/lib/track";
@@ -157,7 +157,7 @@ export default function EditReleasePage() {
     const fd = new FormData();
     fd.append("file", f);
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/releases/${release.id}/cover`,
+      `${getApiBase()}/api/releases/${release.id}/cover`,
       { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: fd }
     );
     const data = await res.json().catch(() => ({}));
