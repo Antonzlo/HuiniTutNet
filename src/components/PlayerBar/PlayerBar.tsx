@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useEffect } from "react";
 import {
   VolumeIcon,
   HeartIcon,
@@ -31,6 +32,12 @@ export function PlayerBar() {
   } = usePlayerPanel();
   const { isFavorite, toggle } = useFavorites();
 
+  const volumeRef = useRef(volume);
+
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
+
   const hasTrack = Boolean(currentTrack);
   const fav = currentTrack ? isFavorite(currentTrack.id) : false;
   const effectiveVolume = muted ? 0 : volume;
@@ -55,6 +62,13 @@ export function PlayerBar() {
     }
     if (!panelFullscreen) openPanelFullscreen();
     openImmersive("lyrics");
+  }
+
+  function handleVolumeWheel(e: React.WheelEvent<HTMLInputElement>) {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.05 : 0.05;
+    const newVolume = Math.max(0, Math.min(1, volumeRef.current + delta));
+    setVolume(newVolume);
   }
 
   return (
@@ -168,6 +182,7 @@ export function PlayerBar() {
           max={100}
           value={volPct}
           onChange={(e) => setVolume(Number(e.target.value) / 100)}
+          onWheel={handleVolumeWheel}
           className={styles.volumeSlider}
           style={{ "--vol": `${volPct}%` } as React.CSSProperties}
           aria-label="Громкость"
